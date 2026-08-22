@@ -1,5 +1,14 @@
-// 여기에 동작(움직임)을 추가합니다. 지금은 비어 있어도 사이트는 잘 작동합니다.
-// 예: 메뉴를 누르면 부드럽게 이동 (이미 CSS로 처리되어 있어 별도 코드는 필요 없습니다)
+// 모바일 메뉴(햄버거 ☰) 열고 닫기
+const toggle = document.querySelector(".nav-toggle");
+const menu = document.querySelector(".nav-menu");
 
-// Codex에게 "메뉴 눌렀을 때 효과 넣어줘" 처럼 말하면 여기에 코드가 채워집니다.
-console.log("사이트가 로드되었습니다.");
+if (toggle && menu) {
+  toggle.addEventListener("click", () => menu.classList.toggle("open"));
+  // 메뉴 항목을 누르면 자동으로 닫히게
+  menu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => menu.classList.remove("open"));
+  });
+}
+
+// 여기에 다른 동작을 추가할 수 있습니다.
+// 예: Codex에게 "스크롤하면 메뉴 배경을 진하게 해줘" 처럼 말하면 코드가 채워집니다.
