@@ -30,57 +30,13 @@
     <p>취급 품목을 여기에 적으세요. (예: Dress / Jacket / Shirt / Skirt)</p>
   </section>
 
-  <!-- ===== 룩 하나 = .look 블록 하나 [작성서 05: 제품01~04] =====
-       제품이 더 있으면 .look 블록을 복사하세요.
-       이미지는 images/ 폴더에 넣고 <img src="images/look01.jpg"> 로 연결.
-       홀수/짝수 번갈아 reverse를 붙이면 좌우가 교차됩니다. -->
+  <!-- ===== 제품 목록 =====
+       ★ 제품은 여기 HTML이 아니라 products.json 파일에서 관리합니다.
+       products.json에 제품을 추가하면 이 목록과 상세 페이지에 자동으로 나타납니다. -->
   <section class="section">
-
-    <div class="look">
-      <div class="look-img"><!-- <img src="images/look01.jpg" alt="LOOK 01" /> --></div>
-      <div>
-        <p class="k">LOOK 01</p>
-        <h3>제품 이름</h3>
-        <p>제품 설명을 여기에 붙여넣으세요.</p>
-        <div class="tags"><span>Keyword</span><span>Keyword</span><span>Keyword</span></div>
-      </div>
+    <div class="grid" id="product-list">
+      <!-- products.json 내용이 자동으로 채워집니다 -->
     </div>
-
-    <div class="look reverse">
-      <div class="look-img"></div>
-      <div>
-        <p class="k">LOOK 02</p>
-        <h3>제품 이름</h3>
-        <p>제품 설명을 여기에 붙여넣으세요.</p>
-        <div class="tags"><span>Keyword</span><span>Keyword</span></div>
-      </div>
-    </div>
-
-    <div class="look">
-      <div class="look-img"></div>
-      <div>
-        <p class="k">LOOK 03</p>
-        <h3>제품 이름</h3>
-        <p>제품 설명을 여기에 붙여넣으세요.</p>
-        <div class="tags"><span>Keyword</span><span>Keyword</span></div>
-      </div>
-    </div>
-
-    <div class="look reverse">
-      <div class="look-img"></div>
-      <div>
-        <p class="k">LOOK 04</p>
-        <h3>제품 이름</h3>
-        <p>제품 설명을 여기에 붙여넣으세요.</p>
-        <div class="tags"><span>Keyword</span><span>Keyword</span></div>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- [작성서 05: 구매 링크] 스마트스토어 등이 있으면 버튼으로 -->
-  <section class="section" style="text-align:center;">
-    <a href="#" class="btn ghost">구매처 바로가기</a>
   </section>
 
   <footer class="footer">
@@ -93,5 +49,32 @@
   </footer>
 
   <script src="script.js"></script>
+  <script>
+    // products.json을 읽어 제품 카드를 자동으로 그립니다. (수정할 필요 없음)
+    fetch("products.json")
+      .then((r) => r.json())
+      .then((data) => {
+        const box = document.getElementById("product-list");
+        box.innerHTML = data.products
+          .map((p) => {
+            const img = p.images && p.images[0]
+              ? '<img src="' + p.images[0] + '" alt="' + p.name + '" onerror="this.remove()" />'
+              : "";
+            return (
+              '<a class="card" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
+              '<div class="card-img">' + img + "</div>" +
+              '<p class="k">' + (p.label || "") + "</p>" +
+              "<h3>" + p.name + "</h3>" +
+              "<p>" + (p.summary || "") + "</p>" +
+              "</a>"
+            );
+          })
+          .join("");
+      })
+      .catch(() => {
+        document.getElementById("product-list").innerHTML =
+          "<p>제품을 불러오지 못했습니다. 로컬에서는 npx serve 로 미리보기 하세요.</p>";
+      });
+  </script>
 </body>
 </html>

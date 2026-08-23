@@ -67,16 +67,11 @@
     </div>
   </section>
 
-  <!-- ===== 대표 제품 미리보기 (제품 페이지로 연결) ===== -->
+  <!-- ===== 대표 제품 미리보기 — products.json에서 자동으로 채워짐 ===== -->
   <section class="section">
     <p class="eyebrow">COLLECTION</p>
     <h2>대표 룩</h2>
-    <div class="grid">
-      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 01</p><h3>제품 이름</h3></a>
-      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 02</p><h3>제품 이름</h3></a>
-      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 03</p><h3>제품 이름</h3></a>
-      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 04</p><h3>제품 이름</h3></a>
-    </div>
+    <div class="grid" id="home-looks"></div>
   </section>
 
   <!-- ===== 푸터 (5페이지 공통) [작성서 01: 푸터 표기 정보] ===== -->
@@ -90,5 +85,27 @@
   </footer>
 
   <script src="script.js"></script>
+  <script>
+    // products.json의 앞 4개 제품을 홈에 보여줍니다. (수정할 필요 없음)
+    fetch("products.json")
+      .then((r) => r.json())
+      .then((data) => {
+        document.getElementById("home-looks").innerHTML = data.products
+          .slice(0, 4)
+          .map((p) => {
+            const img = p.images && p.images[0]
+              ? '<img src="' + p.images[0] + '" alt="' + p.name + '" onerror="this.remove()" />'
+              : "";
+            return (
+              '<a class="card" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
+              '<div class="card-img">' + img + "</div>" +
+              '<p class="k">' + (p.label || "") + "</p>" +
+              "<h3>" + p.name + "</h3></a>"
+            );
+          })
+          .join("");
+      })
+      .catch(() => {});
+  </script>
 </body>
 </html>

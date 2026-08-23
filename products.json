@@ -1,0 +1,45 @@
+{
+  "_설명": "이 파일이 제품 목록입니다. 아래 형식대로 한 덩어리를 복사해 추가하면 제품 페이지와 상세 페이지에 자동으로 나타납니다. 사진은 images 폴더에 올리고 파일명을 적으세요.",
+  "products": [
+    {
+      "id": "look-01",
+      "label": "LOOK 01",
+      "name": "제품 이름",
+      "summary": "목록에 보이는 한 줄 요약",
+      "description": "상세 페이지에 보이는 설명입니다.\n\n빈 줄로 문단을 나눌 수 있습니다.",
+      "keywords": ["Keyword", "Keyword", "Keyword"],
+      "images": ["images/look01-1.jpg", "images/look01-2.jpg"],
+      "buyLink": ""
+    },
+    {
+      "id": "look-02",
+      "label": "LOOK 02",
+      "name": "제품 이름",
+      "summary": "목록에 보이는 한 줄 요약",
+      "description": "상세 페이지에 보이는 설명입니다.",
+      "keywords": ["Keyword", "Keyword"],
+      "images": ["images/look02-1.jpg"],
+      "buyLink": ""
+    },
+    {
+      "id": "look-03",
+      "label": "LOOK 03",
+      "name": "제품 이름",
+      "summary": "목록에 보이는 한 줄 요약",
+      "description": "상세 페이지에 보이는 설명입니다.",
+      "keywords": ["Keyword", "Keyword"],
+      "images": ["images/look03-1.jpg"],
+      "buyLink": ""
+    },
+    {
+      "id": "look-04",
+      "label": "LOOK 04",
+      "name": "제품 이름",
+      "summary": "목록에 보이는 한 줄 요약",
+      "description": "상세 페이지에 보이는 설명입니다.",
+      "keywords": ["Keyword", "Keyword"],
+      "images": ["images/look04-1.jpg"],
+      "buyLink": ""
+    }
+  ]
+}

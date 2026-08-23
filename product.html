@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>제품 상세 — 브랜드 이름</title>
+  <meta name="description" content="제품 상세 정보" />
+  <link rel="icon" href="images/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">BRAND</a>
+      <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
+      <nav class="nav-menu">
+        <a href="index.html">홈</a>
+        <a href="about.html">브랜드 소개</a>
+        <a href="products.html" class="active">제품</a>
+        <a href="portfolio.html">포트폴리오</a>
+        <a href="contact.html">문의</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== 제품 상세 =====
+       ★ 이 페이지는 주소의 ?id= 값으로 products.json에서 해당 제품을 찾아
+       자동으로 내용을 채웁니다. 내용 수정은 products.json에서 하세요. -->
+  <section class="section" id="product-detail">
+    <p>불러오는 중…</p>
+  </section>
+
+  <section class="section" style="text-align:center; padding-top:0;">
+    <a href="products.html" class="btn ghost">← 제품 목록으로</a>
+  </section>
+
+  <footer class="footer">
+    <p class="logo">BRAND</p>
+    <p class="biz">
+      상호: ○○○ · 대표자: ○○○<br />
+      사업자등록번호: 000-00-00000 · 주소: ○○○
+    </p>
+    <p>© 브랜드 이름. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // 주소의 ?id= 값으로 products.json에서 제품을 찾아 상세를 그립니다. (수정할 필요 없음)
+    const id = new URLSearchParams(location.search).get("id");
+    fetch("products.json")
+      .then((r) => r.json())
+      .then((data) => {
+        const p = data.products.find((x) => x.id === id) || data.products[0];
+        if (!p) throw new Error("no product");
+        document.title = p.name + " — 제품 상세";
+
+        const imgs = (p.images || [])
+          .map((src) => '<div class="look-img" style="margin-bottom:14px;"><img src="' + src + '" alt="' + p.name + '" onerror="this.parentElement.style.display=\'none\'" /></div>')
+          .join("");
+        const paras = (p.description || "")
+          .split("\n\n")
+          .map((t) => "<p>" + t.replace(/\n/g, "<br />") + "</p>")
+          .join("");
+        const tags = (p.keywords || []).map((k) => "<span>" + k + "</span>").join("");
+        const buy = p.buyLink
+          ? '<p style="margin-top:20px;"><a class="btn" href="' + p.buyLink + '" target="_blank">구매하기</a></p>'
+          : "";
+
+        document.getElementById("product-detail").innerHTML =
+          '<div class="look">' +
+          "<div>" + (imgs || '<div class="look-img"></div>') + "</div>" +
+          "<div>" +
+          '<p class="k">' + (p.label || "") + "</p>" +
+          "<h3>" + p.name + "</h3>" +
+          paras +
+          '<div class="tags">' + tags + "</div>" +
+          buy +
+          "</div></div>";
+      })
+      .catch(() => {
+        document.getElementById("product-detail").innerHTML =
+          "<p>제품을 찾을 수 없습니다. <a href='products.html'>제품 목록으로</a></p>";
+      });
+  </script>
+</body>
+</html>
