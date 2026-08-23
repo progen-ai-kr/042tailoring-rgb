@@ -51,6 +51,7 @@
   <script src="script.js"></script>
   <script>
     // products.json을 읽어 제품 카드를 자동으로 그립니다. (수정할 필요 없음)
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     fetch("products.json")
       .then((r) => r.json())
       .then((data) => {
@@ -58,14 +59,14 @@
         box.innerHTML = data.products
           .map((p) => {
             const img = p.images && p.images[0]
-              ? '<img src="' + p.images[0] + '" alt="' + p.name + '" onerror="this.remove()" />'
+              ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" onerror="this.remove()" />'
               : "";
             return (
               '<a class="card" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
               '<div class="card-img">' + img + "</div>" +
-              '<p class="k">' + (p.label || "") + "</p>" +
-              "<h3>" + p.name + "</h3>" +
-              "<p>" + (p.summary || "") + "</p>" +
+              '<p class="k">' + esc(p.label || "") + "</p>" +
+              "<h3>" + esc(p.name) + "</h3>" +
+              "<p>" + esc(p.summary || "") + "</p>" +
               "</a>"
             );
           })

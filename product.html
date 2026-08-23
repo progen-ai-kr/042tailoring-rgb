@@ -47,6 +47,7 @@
   <script src="script.js"></script>
   <script>
     // 주소의 ?id= 값으로 products.json에서 제품을 찾아 상세를 그립니다. (수정할 필요 없음)
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     const id = new URLSearchParams(location.search).get("id");
     fetch("products.json")
       .then((r) => r.json())
@@ -56,23 +57,23 @@
         document.title = p.name + " — 제품 상세";
 
         const imgs = (p.images || [])
-          .map((src) => '<div class="look-img" style="margin-bottom:14px;"><img src="' + src + '" alt="' + p.name + '" onerror="this.parentElement.style.display=\'none\'" /></div>')
+          .map((src) => '<div class="look-img" style="margin-bottom:14px;"><img src="' + esc(src) + '" alt="' + esc(p.name) + '" onerror="this.parentElement.style.display=\'none\'" /></div>')
           .join("");
         const paras = (p.description || "")
           .split("\n\n")
-          .map((t) => "<p>" + t.replace(/\n/g, "<br />") + "</p>")
+          .map((t) => "<p>" + esc(t).replace(/\n/g, "<br />") + "</p>")
           .join("");
-        const tags = (p.keywords || []).map((k) => "<span>" + k + "</span>").join("");
+        const tags = (p.keywords || []).map((k) => "<span>" + esc(k) + "</span>").join("");
         const buy = p.buyLink
-          ? '<p style="margin-top:20px;"><a class="btn" href="' + p.buyLink + '" target="_blank">구매하기</a></p>'
+          ? '<p style="margin-top:20px;"><a class="btn" href="' + esc(p.buyLink) + '" target="_blank">구매하기</a></p>'
           : "";
 
         document.getElementById("product-detail").innerHTML =
           '<div class="look">' +
           "<div>" + (imgs || '<div class="look-img"></div>') + "</div>" +
           "<div>" +
-          '<p class="k">' + (p.label || "") + "</p>" +
-          "<h3>" + p.name + "</h3>" +
+          '<p class="k">' + esc(p.label || "") + "</p>" +
+          "<h3>" + esc(p.name) + "</h3>" +
           paras +
           '<div class="tags">' + tags + "</div>" +
           buy +

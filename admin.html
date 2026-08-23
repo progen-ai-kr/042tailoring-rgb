@@ -118,6 +118,7 @@
     let editIndex = -1;
 
     const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     const toast = (msg, long) => { const t = $("toast"); t.textContent = msg; t.classList.add("show");
       clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), long ? 5000 : 2600); };
 
@@ -153,7 +154,13 @@
       if (!Array.isArray(data.products)) data.products = [];
     }
 
-    async function commitJson(message) {
+    let _q = Promise.resolve();
+    function commitJson(message) {            // 연속 저장을 순서대로 처리 (충돌 방지)
+      const job = _q.catch(() => {}).then(() => _commit(message));
+      _q = job;
+      return job;
+    }
+    async function _commit(message) {
       const body = { message, branch: BRANCH, content: enc(JSON.stringify(data, null, 2)), sha: jsonSha };
       const r = await api("/contents/products.json", { method: "PUT", body: JSON.stringify(body) });
       if (!r.ok) throw new Error("저장 실패 (" + r.status + ")");
@@ -163,9 +170,9 @@
 
     function renderList() {
       $("plist").innerHTML = data.products.map((p, i) => {
-        const img = p.images && p.images[0] ? '<img class="pthumb" src="' + p.images[0] + '" onerror="this.style.visibility=\'hidden\'" />' : '<div class="pthumb"></div>';
+        const img = p.images && p.images[0] ? '<img class="pthumb" src="' + esc(p.images[0]) + '" onerror="this.style.visibility=\'hidden\'" />' : '<div class="pthumb"></div>';
         return '<div class="plist-item">' + img +
-          '<div class="pmeta"><div class="nm">' + (p.name || "(이름 없음)") + '</div><div class="sm">' + (p.label || "") + " · " + (p.summary || "") + "</div></div>" +
+          '<div class="pmeta"><div class="nm">' + esc(p.name || "(이름 없음)") + '</div><div class="sm">' + esc(p.label || "") + " · " + esc(p.summary || "") + "</div></div>" +
           '<div class="pbtns">' +
           '<button class="abtn ghost small" onclick="move(' + i + ',-1)">↑</button>' +
           '<button class="abtn ghost small" onclick="move(' + i + ',1)">↓</button>' +
@@ -207,7 +214,7 @@
 
     function renderImgs() {
       $("e_images").innerHTML = window._imgs.map((src, i) =>
-        '<div class="imgchip"><img src="' + src + '" onerror="this.style.opacity=.3" />' +
+        '<div class="imgchip"><img src="' + esc(src) + '" onerror="this.style.opacity=.3" />' +
         '<button class="x" onclick="window._imgs.splice(' + i + ',1);renderImgs()">✕</button></div>').join("");
     }
 

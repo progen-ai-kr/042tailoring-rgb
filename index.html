@@ -87,6 +87,7 @@
   <script src="script.js"></script>
   <script>
     // products.json의 앞 4개 제품을 홈에 보여줍니다. (수정할 필요 없음)
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     fetch("products.json")
       .then((r) => r.json())
       .then((data) => {
@@ -94,13 +95,13 @@
           .slice(0, 4)
           .map((p) => {
             const img = p.images && p.images[0]
-              ? '<img src="' + p.images[0] + '" alt="' + p.name + '" onerror="this.remove()" />'
+              ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" onerror="this.remove()" />'
               : "";
             return (
               '<a class="card" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
               '<div class="card-img">' + img + "</div>" +
-              '<p class="k">' + (p.label || "") + "</p>" +
-              "<h3>" + p.name + "</h3></a>"
+              '<p class="k">' + esc(p.label || "") + "</p>" +
+              "<h3>" + esc(p.name) + "</h3></a>"
             );
           })
           .join("");
