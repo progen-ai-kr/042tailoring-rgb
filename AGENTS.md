@@ -45,6 +45,8 @@
 
 ## 건들지 말 것
 - **`wrangler.jsonc`** — 배포 설정 파일입니다. 수정하지 마세요.
+- **`admin.html`** — 브랜드가 제품을 관리하는 관리자 페이지입니다. 수정하지 마세요. (스타일도 사이트 테마와 독립적으로 유지)
+- `products.json`의 **필드 구조(id·label·name·summary·description·keywords·images·buyLink)** — admin.html이 이 구조로 저장하므로 필드명을 바꾸지 마세요. 내용 추가는 OK.
 - `.git` 폴더 및 배포 관련 설정.
 
 ## 배포
