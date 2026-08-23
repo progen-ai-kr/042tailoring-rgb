@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>제품 관리자</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* 관리자 전용 스타일 */
+    .admin-wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 80px; }
+    .admin-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; margin-bottom: 16px; }
+    .admin-card h2 { font-size: 18px; margin-bottom: 12px; }
+    .f { margin-bottom: 14px; }
+    .f label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+    .f .hint { font-weight: 400; color: var(--ink-soft); font-size: 12px; margin-left: 6px; }
+    .f input[type="text"], .f input[type="password"], .f textarea {
+      width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px;
+      font: inherit; font-size: 14px; background: var(--bg);
+    }
+    .f textarea { min-height: 120px; resize: vertical; }
+    .abtn { display: inline-block; border: 0; cursor: pointer; font: inherit; font-size: 14px;
+      background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 999px; }
+    .abtn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+    .abtn.danger { background: #b3402f; }
+    .abtn.small { padding: 6px 12px; font-size: 12.5px; }
+    .plist-item { display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--line); padding: 12px 0; }
+    .plist-item:first-child { border-top: 0; }
+    .pthumb { width: 52px; height: 66px; border-radius: 8px; background: var(--surface); object-fit: cover; flex-shrink: 0; }
+    .pmeta { flex: 1; min-width: 0; }
+    .pmeta .nm { font-weight: 700; font-size: 14.5px; }
+    .pmeta .sm { font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pbtns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .imgrow { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+    .imgchip { position: relative; }
+    .imgchip img { width: 74px; height: 96px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+    .imgchip .x { position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%;
+      background: #b3402f; color: #fff; border: 0; cursor: pointer; font-size: 12px; line-height: 1; }
+    #toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+      background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 999px; font-size: 14px;
+      opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 50; max-width: 90vw; text-align: center; }
+    #toast.show { opacity: 1; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .muted { color: var(--ink-soft); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-wrap">
+    <div class="topbar">
+      <h1 style="font-size:22px;">🛍 제품 관리자</h1>
+      <a class="muted" href="index.html" target="_blank">사이트 보기 ↗</a>
+    </div>
+
+    <!-- ── 1) 연결 화면 (접속키 입력) ── -->
+    <div class="admin-card" id="setup" style="display:none;">
+      <h2>처음 한 번만 연결하세요</h2>
+      <p class="muted" style="margin-bottom:14px;">운영진에게 받은 <b>접속키</b>를 붙여넣으면, 이후에는 이 화면 없이 바로 제품을 관리할 수 있습니다.</p>
+      <div class="f">
+        <label>접속키 <span class="hint">(github_pat_… 로 시작하는 긴 문자)</span></label>
+        <input type="password" id="tokenInput" placeholder="접속키 붙여넣기" />
+      </div>
+      <div class="f">
+        <label>저장소 이름 <span class="hint">(자동 입력됨 — 바꾸지 마세요)</span></label>
+        <input type="text" id="repoInput" />
+      </div>
+      <button class="abtn" onclick="connect()">연결하기</button>
+      <p class="muted" id="setupMsg" style="margin-top:10px;"></p>
+    </div>
+
+    <!-- ── 2) 제품 목록 ── -->
+    <div class="admin-card" id="listCard" style="display:none;">
+      <div class="topbar">
+        <h2>제품 목록</h2>
+        <button class="abtn" onclick="openEditor(-1)">＋ 새 제품</button>
+      </div>
+      <div id="plist"></div>
+      <p class="muted" style="margin-top:12px;">순서 = 사이트에 보이는 순서 (홈에는 위에서 4개가 나옵니다)</p>
+      <p class="muted" style="margin-top:6px;"><a href="#" onclick="logout();return false;">연결 해제</a></p>
+    </div>
+
+    <!-- ── 3) 제품 편집기 ── -->
+    <div class="admin-card" id="editor" style="display:none;">
+      <h2 id="editorTitle">제품 수정</h2>
+      <div class="f"><label>라벨 <span class="hint">목록에 작게 표시 (예: LOOK 05)</span></label><input type="text" id="e_label" /></div>
+      <div class="f"><label>제품 이름</label><input type="text" id="e_name" /></div>
+      <div class="f"><label>한 줄 요약 <span class="hint">목록 카드에 표시</span></label><input type="text" id="e_summary" /></div>
+      <div class="f"><label>상세 설명 <span class="hint">빈 줄 두 번 = 문단 나눔</span></label><textarea id="e_desc"></textarea></div>
+      <div class="f"><label>키워드 <span class="hint">쉼표로 구분 (예: Feminine, Tailored)</span></label><input type="text" id="e_keywords" /></div>
+      <div class="f"><label>구매 링크 <span class="hint">없으면 비워두세요</span></label><input type="text" id="e_buy" placeholder="https://..." /></div>
+      <div class="f">
+        <label>사진 <span class="hint">첫 번째 사진이 대표 사진 · 세로형(3:4) 권장</span></label>
+        <div class="imgrow" id="e_images"></div>
+        <input type="file" id="e_upload" accept="image/*" multiple />
+      </div>
+      <div style="display:flex; gap:10px; margin-top:18px;">
+        <button class="abtn" onclick="saveProduct()">저장하기</button>
+        <button class="abtn ghost" onclick="closeEditor()">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    // ─────────────────────────────────────────────
+    // 제품 관리자: GitHub 저장소의 products.json / images 를
+    // 브라우저에서 직접 편집·저장합니다. (서버·DB 없음)
+    // 저장하면 자동 배포로 1~2분 뒤 사이트에 반영됩니다.
+    // 이 파일은 수정하지 마세요.
+    // ─────────────────────────────────────────────
+    const OWNER = "progen-ai-kr";
+    const BRANCH = "main";
+    let token = localStorage.getItem("admin_token") || "";
+    let repo = localStorage.getItem("admin_repo") || location.hostname.split(".")[0];
+    let data = { products: [] };
+    let jsonSha = null;
+    let editIndex = -1;
+
+    const $ = (id) => document.getElementById(id);
+    const toast = (msg, long) => { const t = $("toast"); t.textContent = msg; t.classList.add("show");
+      clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), long ? 5000 : 2600); };
+
+    const api = (path, opt = {}) =>
+      fetch("https://api.github.com/repos/" + OWNER + "/" + repo + path, {
+        ...opt,
+        headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", ...(opt.headers || {}) },
+      });
+
+    // 한글 안전 base64 인코딩/디코딩
+    const enc = (str) => { const b = new TextEncoder().encode(str); let s = ""; b.forEach((c) => (s += String.fromCharCode(c))); return btoa(s); };
+    const dec = (b64) => { const s = atob(b64.replace(/\n/g, "")); const b = new Uint8Array([...s].map((c) => c.charCodeAt(0))); return new TextDecoder().decode(b); };
+
+    async function connect() {
+      token = $("tokenInput").value.trim();
+      repo = $("repoInput").value.trim();
+      $("setupMsg").textContent = "확인 중…";
+      const r = await api("/contents/products.json?ref=" + BRANCH);
+      if (!r.ok) { $("setupMsg").textContent = "❌ 연결 실패 — 접속키를 다시 확인해 주세요. (" + r.status + ")"; return; }
+      localStorage.setItem("admin_token", token);
+      localStorage.setItem("admin_repo", repo);
+      init();
+    }
+
+    function logout() { localStorage.removeItem("admin_token"); location.reload(); }
+
+    async function loadJson() {
+      const r = await api("/contents/products.json?ref=" + BRANCH);
+      if (!r.ok) throw new Error(r.status);
+      const j = await r.json();
+      jsonSha = j.sha;
+      data = JSON.parse(dec(j.content));
+      if (!Array.isArray(data.products)) data.products = [];
+    }
+
+    async function commitJson(message) {
+      const body = { message, branch: BRANCH, content: enc(JSON.stringify(data, null, 2)), sha: jsonSha };
+      const r = await api("/contents/products.json", { method: "PUT", body: JSON.stringify(body) });
+      if (!r.ok) throw new Error("저장 실패 (" + r.status + ")");
+      const j = await r.json();
+      jsonSha = j.content.sha;
+    }
+
+    function renderList() {
+      $("plist").innerHTML = data.products.map((p, i) => {
+        const img = p.images && p.images[0] ? '<img class="pthumb" src="' + p.images[0] + '" onerror="this.style.visibility=\'hidden\'" />' : '<div class="pthumb"></div>';
+        return '<div class="plist-item">' + img +
+          '<div class="pmeta"><div class="nm">' + (p.name || "(이름 없음)") + '</div><div class="sm">' + (p.label || "") + " · " + (p.summary || "") + "</div></div>" +
+          '<div class="pbtns">' +
+          '<button class="abtn ghost small" onclick="move(' + i + ',-1)">↑</button>' +
+          '<button class="abtn ghost small" onclick="move(' + i + ',1)">↓</button>' +
+          '<button class="abtn small" onclick="openEditor(' + i + ')">수정</button>' +
+          '<button class="abtn danger small" onclick="removeProduct(' + i + ')">삭제</button>' +
+          "</div></div>";
+      }).join("") || '<p class="muted">아직 제품이 없습니다. "＋ 새 제품"으로 추가하세요.</p>';
+    }
+
+    async function move(i, d) {
+      const j = i + d; if (j < 0 || j >= data.products.length) return;
+      [data.products[i], data.products[j]] = [data.products[j], data.products[i]];
+      renderList();
+      try { await commitJson("제품 순서 변경"); toast("순서 저장됨 — 1~2분 뒤 사이트 반영"); }
+      catch (e) { toast("❌ " + e.message, true); }
+    }
+
+    async function removeProduct(i) {
+      if (!confirm('"' + (data.products[i].name || "") + '" 제품을 삭제할까요?')) return;
+      data.products.splice(i, 1);
+      renderList();
+      try { await commitJson("제품 삭제"); toast("삭제됨 — 1~2분 뒤 사이트 반영"); }
+      catch (e) { toast("❌ " + e.message, true); }
+    }
+
+    function openEditor(i) {
+      editIndex = i;
+      const p = i >= 0 ? data.products[i] : { label: "", name: "", summary: "", description: "", keywords: [], images: [], buyLink: "" };
+      $("editorTitle").textContent = i >= 0 ? "제품 수정" : "새 제품";
+      $("e_label").value = p.label || ""; $("e_name").value = p.name || "";
+      $("e_summary").value = p.summary || ""; $("e_desc").value = p.description || "";
+      $("e_keywords").value = (p.keywords || []).join(", "); $("e_buy").value = p.buyLink || "";
+      window._imgs = [...(p.images || [])];
+      renderImgs();
+      $("editor").style.display = "block"; $("listCard").style.display = "none";
+      window.scrollTo(0, 0);
+    }
+    function closeEditor() { $("editor").style.display = "none"; $("listCard").style.display = "block"; }
+
+    function renderImgs() {
+      $("e_images").innerHTML = window._imgs.map((src, i) =>
+        '<div class="imgchip"><img src="' + src + '" onerror="this.style.opacity=.3" />' +
+        '<button class="x" onclick="window._imgs.splice(' + i + ',1);renderImgs()">✕</button></div>').join("");
+    }
+
+    // 사진 선택 시 즉시 저장소 images/ 폴더에 업로드
+    $("e_upload").addEventListener("change", async (ev) => {
+      for (const file of ev.target.files) {
+        const safe = Date.now().toString(36) + "-" + file.name.replace(/[^\w.\-]/g, "_").toLowerCase();
+        const path = "images/" + safe;
+        toast("사진 올리는 중… " + file.name);
+        const b64 = await new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result.split(",")[1]); fr.readAsDataURL(file); });
+        const r = await api("/contents/" + path, { method: "PUT", body: JSON.stringify({ message: "사진 업로드: " + safe, branch: BRANCH, content: b64 }) });
+        if (r.ok) { window._imgs.push(path); renderImgs(); toast("사진 업로드 완료"); }
+        else toast("❌ 사진 업로드 실패 (" + r.status + ")", true);
+      }
+      ev.target.value = "";
+    });
+
+    async function saveProduct() {
+      const p = {
+        id: editIndex >= 0 ? data.products[editIndex].id : "p-" + Date.now().toString(36),
+        label: $("e_label").value.trim(),
+        name: $("e_name").value.trim(),
+        summary: $("e_summary").value.trim(),
+        description: $("e_desc").value,
+        keywords: $("e_keywords").value.split(",").map((s) => s.trim()).filter(Boolean),
+        images: window._imgs,
+        buyLink: $("e_buy").value.trim(),
+      };
+      if (!p.name) { toast("제품 이름을 입력해 주세요"); return; }
+      if (editIndex >= 0) data.products[editIndex] = p; else data.products.push(p);
+      try {
+        await commitJson((editIndex >= 0 ? "제품 수정: " : "제품 추가: ") + p.name);
+        toast("✅ 저장됨 — 1~2분 뒤 사이트에 반영됩니다", true);
+        closeEditor(); renderList();
+      } catch (e) { toast("❌ " + e.message, true); }
+    }
+
+    async function init() {
+      $("setup").style.display = "none";
+      try { await loadJson(); renderList(); $("listCard").style.display = "block"; }
+      catch (e) { localStorage.removeItem("admin_token"); showSetup("연결이 만료되었어요. 접속키를 다시 입력해 주세요."); }
+    }
+    function showSetup(msg) {
+      $("setup").style.display = "block"; $("listCard").style.display = "none";
+      $("repoInput").value = repo; if (msg) $("setupMsg").textContent = msg;
+    }
+    token ? init() : showSetup();
+  </script>
+</body>
+</html>
