@@ -3,57 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- 아래 제목을 브랜드 이름으로 바꾸세요 -->
+
+  <!-- [작성서 01] 브랜드명으로 바꾸세요 -->
   <title>브랜드 이름</title>
+  <!-- [작성서 02] 한 줄 소개 → 검색·공유 미리보기에 나오는 설명 -->
+  <meta name="description" content="브랜드 한 줄 소개를 여기에 적으세요." />
+
+  <!-- 카톡/인스타 공유 미리보기 (OG 태그) — 브랜드명·소개·대표이미지로 바꾸세요 -->
+  <meta property="og:title" content="브랜드 이름" />
+  <meta property="og:description" content="브랜드 한 줄 소개" />
+  <meta property="og:image" content="images/og.jpg" />
+  <meta property="og:type" content="website" />
+
+  <!-- 탭 아이콘 (images/favicon.png 넣으면 표시됨) -->
+  <link rel="icon" href="images/favicon.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ===== 상단 메뉴 (모바일에서는 ☰ 버튼) ===== -->
+  <!-- ===== 상단 메뉴 (5페이지 공통 — 수정하면 모든 페이지에 똑같이 반영하세요) ===== -->
   <header class="nav">
     <div class="nav-inner">
-      <a href="#home" class="logo">BRAND</a>
+      <a href="index.html" class="logo">BRAND</a>
       <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
       <nav class="nav-menu">
-        <a href="#about">소개</a>
-        <a href="#lookbook">룩북</a>
-        <a href="#contact">문의</a>
+        <a href="index.html" class="active">홈</a>
+        <a href="about.html">브랜드 소개</a>
+        <a href="products.html">제품</a>
+        <a href="portfolio.html">포트폴리오</a>
+        <a href="contact.html">문의</a>
       </nav>
     </div>
   </header>
 
-  <!-- ===== 첫 화면(히어로) ===== -->
-  <section id="home" class="hero">
-    <h1>브랜드 한 줄 슬로건</h1>
-    <p>여기에 브랜드를 소개하는 짧은 문장을 적으세요.</p>
-    <a href="#lookbook" class="btn">둘러보기</a>
+  <!-- ===== 히어로 [작성서 04 홈: 메인 카피·서브 카피] ===== -->
+  <section class="hero">
+    <p class="eyebrow">BRAND KEYWORD · KEYWORD</p>
+    <h1>메인 카피 (20자 내)</h1>
+    <p>서브 카피 (40자 내) — 브랜드를 소개하는 짧은 문장을 적으세요.</p>
+    <a href="products.html" class="btn">컬렉션 보기</a>
   </section>
 
-  <!-- ===== 소개 ===== -->
-  <section id="about" class="section">
-    <h2>브랜드 소개</h2>
-    <p>브랜드 이야기, 철학, 만드는 사람에 대한 내용을 적으세요.</p>
-  </section>
-
-  <!-- ===== 룩북/제품 ===== -->
-  <section id="lookbook" class="section">
-    <h2>룩북</h2>
-    <div class="grid">
-      <!-- 카드 하나가 제품/사진 하나입니다. 필요한 만큼 복사하세요. -->
-      <div class="card"><div class="card-img"></div><p>제품 이름</p></div>
-      <div class="card"><div class="card-img"></div><p>제품 이름</p></div>
-      <div class="card"><div class="card-img"></div><p>제품 이름</p></div>
+  <!-- ===== 강점 3가지 [작성서 04 홈: 강점3가지] ===== -->
+  <section class="section">
+    <p class="eyebrow">WHY US</p>
+    <h2>우리 브랜드의 강점</h2>
+    <div class="features">
+      <div class="feature">
+        <p class="num">01</p>
+        <h3>강점 제목</h3>
+        <p>강점 설명을 적으세요.</p>
+      </div>
+      <div class="feature">
+        <p class="num">02</p>
+        <h3>강점 제목</h3>
+        <p>강점 설명을 적으세요.</p>
+      </div>
+      <div class="feature">
+        <p class="num">03</p>
+        <h3>강점 제목</h3>
+        <p>강점 설명을 적으세요.</p>
+      </div>
     </div>
   </section>
 
-  <!-- ===== 문의 ===== -->
-  <section id="contact" class="section">
-    <h2>문의</h2>
-    <p>인스타그램 · 이메일 등 연락처를 적으세요.</p>
+  <!-- ===== 대표 제품 미리보기 (제품 페이지로 연결) ===== -->
+  <section class="section">
+    <p class="eyebrow">COLLECTION</p>
+    <h2>대표 룩</h2>
+    <div class="grid">
+      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 01</p><h3>제품 이름</h3></a>
+      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 02</p><h3>제품 이름</h3></a>
+      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 03</p><h3>제품 이름</h3></a>
+      <a href="products.html" class="card"><div class="card-img"></div><p class="k">LOOK 04</p><h3>제품 이름</h3></a>
+    </div>
   </section>
 
+  <!-- ===== 푸터 (5페이지 공통) [작성서 01: 푸터 표기 정보] ===== -->
   <footer class="footer">
-    <p>© 브랜드 이름</p>
+    <p class="logo">BRAND</p>
+    <p class="biz">
+      상호: ○○○ · 대표자: ○○○<br />
+      사업자등록번호: 000-00-00000 · 주소: ○○○
+    </p>
+    <p>© 브랜드 이름. All rights reserved.</p>
   </footer>
 
   <script src="script.js"></script>

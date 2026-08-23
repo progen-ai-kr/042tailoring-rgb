@@ -1,87 +1,110 @@
-/* ===== 기본값 (건드리지 않아도 됩니다) =====
-   이 사이트는 "모바일 우선(mobile-first)"으로 만들어졌습니다.
-   기본 스타일 = 휴대폰 화면, 아래쪽 @media = 큰 화면(PC)용입니다. */
+/* ==========================================================
+   ★ 브랜드 디자인 토큰 — 여기 값만 바꾸면 사이트 전체 톤이 바뀝니다
+   (예: RE:STITCH → --bg:#F7F4EE; --ink:#111; --accent:#0E5A5A;)
+   ========================================================== */
+:root {
+  --bg: #faf9f6;        /* 페이지 배경 */
+  --surface: #f1efe9;   /* 카드·옅은 배경 */
+  --ink: #1a1a1a;       /* 기본 글자색 */
+  --ink-soft: #5c5c56;  /* 보조 글자색 */
+  --accent: #1a1a1a;    /* 강조색 (버튼·포인트) */
+  --line: #e4e1d8;      /* 테두리 선 */
+
+  --font-main: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-display: var(--font-main);  /* 제목용 폰트 (다르게 쓰고 싶으면 변경) */
+
+  --radius: 12px;
+  --maxw: 1080px;
+}
+
+/* ===== 기본값 (모바일 우선 — 기본이 휴대폰 화면) ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-body {
-  font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-  color: #1a1a1a;
-  line-height: 1.6;
-}
+body { font-family: var(--font-main); color: var(--ink); background: var(--bg); line-height: 1.7; }
 img { max-width: 100%; display: block; }
+a { color: inherit; }
 
-/* ===== 색상: 이 값들만 바꿔도 분위기가 확 달라집니다 ===== */
-:root {
-  --accent: #1a1a1a;   /* 강조색 (버튼/로고) */
-  --bg-soft: #f5f5f3;  /* 옅은 배경 */
-}
-
-/* ===== 상단 메뉴 ===== */
-.nav {
-  position: sticky; top: 0; z-index: 20;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #eee;
-}
-.nav-inner {
-  max-width: 1080px; margin: 0 auto; padding: 14px 20px;
-  display: flex; align-items: center; justify-content: space-between;
-  position: relative;
-}
-.logo { font-weight: 800; letter-spacing: 1px; text-decoration: none; color: var(--accent); font-size: 20px; }
-
-/* 햄버거 버튼: 모바일에서만 보임 */
-.nav-toggle {
-  background: none; border: 0; font-size: 26px; line-height: 1;
-  cursor: pointer; color: var(--accent); padding: 4px 8px;
-}
-/* 메뉴: 모바일에서는 접혀 있다가 ☰ 누르면 펼쳐짐 */
-.nav-menu {
-  display: none;
-  position: absolute; top: 100%; left: 0; right: 0;
-  flex-direction: column;
-  background: #fff; border-bottom: 1px solid #eee;
-  padding: 8px 20px 16px;
-}
+/* ===== 상단 메뉴 (모바일: 햄버거) ===== */
+.nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 92%, white); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.nav-inner { max-width: var(--maxw); margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: relative; }
+.logo { font-family: var(--font-display); font-weight: 800; letter-spacing: 2px; text-decoration: none; font-size: 19px; }
+.nav-toggle { background: none; border: 0; font-size: 26px; line-height: 1; cursor: pointer; color: var(--ink); padding: 4px 8px; }
+.nav-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px 20px 16px; }
 .nav-menu.open { display: flex; }
-.nav-menu a {
-  text-decoration: none; color: #333; font-size: 16px;
-  padding: 12px 0; border-top: 1px solid #f0f0f0;
-}
+.nav-menu a { text-decoration: none; color: var(--ink-soft); font-size: 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+.nav-menu a.active { color: var(--ink); font-weight: 700; }
 
-/* ===== 첫 화면 ===== */
-.hero {
-  min-height: 78vh; background: var(--bg-soft);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 40px 22px; gap: 18px;
-}
-.hero h1 { font-size: clamp(26px, 8vw, 56px); }
-.hero p { color: #555; max-width: 520px; }
-.btn {
-  display: inline-block; background: var(--accent); color: #fff;
-  padding: 14px 30px; border-radius: 999px; text-decoration: none; font-size: 16px;
-}
+/* ===== 히어로 (홈 첫 화면) ===== */
+.hero { min-height: 72vh; background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px 22px; gap: 16px; }
+.hero .eyebrow { font-size: 12px; letter-spacing: 3px; color: var(--ink-soft); text-transform: uppercase; }
+.hero h1 { font-family: var(--font-display); font-size: clamp(28px, 8vw, 58px); letter-spacing: 1px; }
+.hero p { color: var(--ink-soft); max-width: 560px; }
+.btn { display: inline-block; background: var(--accent); color: var(--bg); padding: 14px 32px; border-radius: 999px; text-decoration: none; font-size: 15px; letter-spacing: 1px; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
 
 /* ===== 공통 섹션 ===== */
-.section { max-width: 1080px; margin: 0 auto; padding: 56px 22px; }
-.section h2 { font-size: clamp(22px, 6vw, 30px); margin-bottom: 18px; }
+.section { max-width: var(--maxw); margin: 0 auto; padding: 56px 22px; }
+.section .eyebrow { font-size: 12px; letter-spacing: 3px; color: var(--ink-soft); text-transform: uppercase; margin-bottom: 6px; }
+.section h2 { font-family: var(--font-display); font-size: clamp(22px, 6vw, 32px); margin-bottom: 18px; }
+.section h3 { font-size: clamp(16px, 4.5vw, 20px); margin: 20px 0 8px; }
+.lead { font-size: clamp(15px, 4vw, 18px); color: var(--ink-soft); max-width: 640px; }
 
-/* ===== 룩북 그리드 (모바일: 2칸) ===== */
+/* ===== 페이지 머리(서브페이지 상단) ===== */
+.page-head { background: var(--surface); text-align: center; padding: 64px 22px 48px; }
+.page-head h1 { font-family: var(--font-display); font-size: clamp(26px, 7vw, 44px); }
+.page-head p { color: var(--ink-soft); margin-top: 8px; }
+
+/* ===== 강점 3가지 / 특징 ===== */
+.features { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.feature { background: var(--surface); border-radius: var(--radius); padding: 22px; }
+.feature .num { font-size: 12px; letter-spacing: 2px; color: var(--ink-soft); }
+.feature h3 { margin: 6px 0 8px; }
+.feature p { color: var(--ink-soft); font-size: 14.5px; }
+
+/* ===== 제품(룩) 카드 ===== */
 .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-.card-img { aspect-ratio: 3/4; background: var(--bg-soft); border-radius: 12px; margin-bottom: 8px; }
-.card p { font-size: 14px; color: #444; }
+.card { text-decoration: none; }
+.card-img { aspect-ratio: 3/4; background: var(--surface); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; }
+.card .k { font-size: 11px; letter-spacing: 2px; color: var(--ink-soft); text-transform: uppercase; }
+.card h3 { font-size: 15px; margin: 2px 0 4px; }
+.card p { font-size: 13px; color: var(--ink-soft); }
 
-/* ===== 하단 ===== */
-.footer { border-top: 1px solid #eee; padding: 40px 22px; text-align: center; color: #888; font-size: 14px; }
+/* 제품 상세형(큰 이미지+설명 교차) */
+.look { display: grid; grid-template-columns: 1fr; gap: 18px; margin: 36px 0; }
+.look-img { aspect-ratio: 3/4; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+.look-img img { width: 100%; height: 100%; object-fit: cover; }
+.look .k { font-size: 11px; letter-spacing: 2px; color: var(--ink-soft); text-transform: uppercase; }
+.look h3 { font-size: clamp(18px, 5vw, 24px); margin: 4px 0 8px; }
+.look p { color: var(--ink-soft); }
+.tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span { font-size: 11.5px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--ink-soft); }
 
-/* ===== 큰 화면(PC/태블릿)용 — 720px 이상 ===== */
+/* ===== 포트폴리오 사례 ===== */
+.case { border-top: 1px solid var(--line); padding: 28px 0; }
+.case .k { font-size: 12px; letter-spacing: 2px; color: var(--ink-soft); }
+.case h3 { margin: 6px 0 8px; }
+.case p { color: var(--ink-soft); }
+
+/* ===== 문의 ===== */
+.contact-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 8px; }
+.contact-item { background: var(--surface); border-radius: var(--radius); padding: 18px 20px; }
+.contact-item .label { font-size: 12px; letter-spacing: 2px; color: var(--ink-soft); text-transform: uppercase; }
+.contact-item .value { font-size: 16px; margin-top: 4px; word-break: break-all; }
+
+/* ===== 푸터 (모든 페이지 공통) ===== */
+.footer { border-top: 1px solid var(--line); padding: 40px 22px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+.footer .biz { margin-top: 8px; line-height: 1.9; }
+
+/* ===== 큰 화면(태블릿/PC) — 720px 이상 ===== */
 @media (min-width: 720px) {
-  .nav-toggle { display: none; }               /* 햄버거 숨김 */
-  .nav-menu {                                   /* 메뉴를 가로로 펼침 */
-    display: flex; flex-direction: row; position: static;
-    background: none; border: 0; padding: 0; gap: 24px;
-  }
-  .nav-menu a { border-top: 0; padding: 0; }
-  .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-  .section { padding: 76px 24px; }
+  .nav-toggle { display: none; }
+  .nav-menu { display: flex; flex-direction: row; position: static; background: none; border: 0; padding: 0; gap: 26px; }
+  .nav-menu a { border-top: 0; padding: 0; font-size: 15px; }
+  .section { padding: 80px 24px; }
+  .features { grid-template-columns: repeat(3, 1fr); }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px; }
+  .look { grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
+  .look.reverse .look-img { order: 2; }
+  .contact-list { grid-template-columns: repeat(2, 1fr); }
 }

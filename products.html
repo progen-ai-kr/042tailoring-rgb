@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>제품 — 브랜드 이름</title>
+  <meta name="description" content="브랜드의 제품(컬렉션)을 소개합니다." />
+  <link rel="icon" href="images/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">BRAND</a>
+      <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
+      <nav class="nav-menu">
+        <a href="index.html">홈</a>
+        <a href="about.html">브랜드 소개</a>
+        <a href="products.html" class="active">제품</a>
+        <a href="portfolio.html">포트폴리오</a>
+        <a href="contact.html">문의</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- [작성서 05: 취급 품목] -->
+  <section class="page-head">
+    <h1>제품</h1>
+    <p>취급 품목을 여기에 적으세요. (예: Dress / Jacket / Shirt / Skirt)</p>
+  </section>
+
+  <!-- ===== 룩 하나 = .look 블록 하나 [작성서 05: 제품01~04] =====
+       제품이 더 있으면 .look 블록을 복사하세요.
+       이미지는 images/ 폴더에 넣고 <img src="images/look01.jpg"> 로 연결.
+       홀수/짝수 번갈아 reverse를 붙이면 좌우가 교차됩니다. -->
+  <section class="section">
+
+    <div class="look">
+      <div class="look-img"><!-- <img src="images/look01.jpg" alt="LOOK 01" /> --></div>
+      <div>
+        <p class="k">LOOK 01</p>
+        <h3>제품 이름</h3>
+        <p>제품 설명을 여기에 붙여넣으세요.</p>
+        <div class="tags"><span>Keyword</span><span>Keyword</span><span>Keyword</span></div>
+      </div>
+    </div>
+
+    <div class="look reverse">
+      <div class="look-img"></div>
+      <div>
+        <p class="k">LOOK 02</p>
+        <h3>제품 이름</h3>
+        <p>제품 설명을 여기에 붙여넣으세요.</p>
+        <div class="tags"><span>Keyword</span><span>Keyword</span></div>
+      </div>
+    </div>
+
+    <div class="look">
+      <div class="look-img"></div>
+      <div>
+        <p class="k">LOOK 03</p>
+        <h3>제품 이름</h3>
+        <p>제품 설명을 여기에 붙여넣으세요.</p>
+        <div class="tags"><span>Keyword</span><span>Keyword</span></div>
+      </div>
+    </div>
+
+    <div class="look reverse">
+      <div class="look-img"></div>
+      <div>
+        <p class="k">LOOK 04</p>
+        <h3>제품 이름</h3>
+        <p>제품 설명을 여기에 붙여넣으세요.</p>
+        <div class="tags"><span>Keyword</span><span>Keyword</span></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- [작성서 05: 구매 링크] 스마트스토어 등이 있으면 버튼으로 -->
+  <section class="section" style="text-align:center;">
+    <a href="#" class="btn ghost">구매처 바로가기</a>
+  </section>
+
+  <footer class="footer">
+    <p class="logo">BRAND</p>
+    <p class="biz">
+      상호: ○○○ · 대표자: ○○○<br />
+      사업자등록번호: 000-00-00000 · 주소: ○○○
+    </p>
+    <p>© 브랜드 이름. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
