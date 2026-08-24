@@ -85,23 +85,24 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="catalog.js"></script>
   <script>
-    // products.json의 앞 4개 제품을 홈에 보여줍니다. (수정할 필요 없음)
-    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-    fetch("products.json")
-      .then((r) => r.json())
-      .then((data) => {
-        document.getElementById("home-looks").innerHTML = data.products
-          .slice(0, 4)
+    // 공개 제품 중 '홈 대표 제품'을 최대 4개 보여줍니다.
+    ProductCatalog.loadVisibleProducts()
+      .then((products) => {
+        const featured = products.filter((product) => product.featured);
+        const homeProducts = (featured.length ? featured : products).slice(0, 4);
+        document.getElementById("home-looks").innerHTML = homeProducts
           .map((p) => {
-            const img = p.images && p.images[0]
-              ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" onerror="this.remove()" />'
+            const image = ProductCatalog.safeImageUrl(p.images && p.images[0]);
+            const img = image
+              ? '<img src="' + ProductCatalog.escapeHtml(image) + '" alt="' + ProductCatalog.escapeHtml(p.name) + '" onerror="this.remove()" />'
               : "";
             return (
               '<a class="card" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
               '<div class="card-img">' + img + "</div>" +
-              '<p class="k">' + esc(p.label || "") + "</p>" +
-              "<h3>" + esc(p.name) + "</h3></a>"
+              '<p class="k">' + ProductCatalog.escapeHtml(p.label || p.category || "") + "</p>" +
+              "<h3>" + ProductCatalog.escapeHtml(p.name) + "</h3></a>"
             );
           })
           .join("");

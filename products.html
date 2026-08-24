@@ -49,24 +49,25 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="catalog.js"></script>
   <script>
-    // products.json을 읽어 제품 카드를 자동으로 그립니다. (수정할 필요 없음)
-    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-    fetch("products.json")
-      .then((r) => r.json())
-      .then((data) => {
+    // 공개된 products.json 제품을 카드로 그립니다. 학생은 CSS로 자유롭게 디자인할 수 있습니다.
+    ProductCatalog.loadVisibleProducts()
+      .then((products) => {
         const box = document.getElementById("product-list");
-        box.innerHTML = data.products
+        box.innerHTML = products
           .map((p) => {
-            const img = p.images && p.images[0]
-              ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" onerror="this.remove()" />'
+            const image = ProductCatalog.safeImageUrl(p.images && p.images[0]);
+            const img = image
+              ? '<img src="' + ProductCatalog.escapeHtml(image) + '" alt="' + ProductCatalog.escapeHtml(p.name) + '" onerror="this.remove()" />'
               : "";
+            const price = p.price ? '<p class="price">' + ProductCatalog.escapeHtml(p.price) + "</p>" : "";
             return (
               '<a class="card" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
               '<div class="card-img">' + img + "</div>" +
-              '<p class="k">' + esc(p.label || "") + "</p>" +
-              "<h3>" + esc(p.name) + "</h3>" +
-              "<p>" + esc(p.summary || "") + "</p>" +
+              '<p class="k">' + ProductCatalog.escapeHtml(p.label || p.category || "") + "</p>" +
+              "<h3>" + ProductCatalog.escapeHtml(p.name) + "</h3>" +
+              "<p>" + ProductCatalog.escapeHtml(p.summary || "") + "</p>" + price +
               "</a>"
             );
           })

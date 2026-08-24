@@ -24,14 +24,12 @@
     </div>
   </header>
 
-  <!-- ===== 제품 상세 =====
-       ★ 이 페이지는 주소의 ?id= 값으로 products.json에서 해당 제품을 찾아
-       자동으로 내용을 채웁니다. 내용 수정은 products.json에서 하세요. -->
-  <section class="section" id="product-detail">
-    <p>불러오는 중…</p>
-  </section>
+  <!-- 브랜드 담당자가 만든 제품 정보와 상세 내용이 자동으로 채워집니다. -->
+  <main id="product-detail" aria-live="polite">
+    <section class="section"><p>제품 정보를 불러오는 중…</p></section>
+  </main>
 
-  <section class="section" style="text-align:center; padding-top:0;">
+  <section class="section product-back">
     <a href="products.html" class="btn ghost">← 제품 목록으로</a>
   </section>
 
@@ -45,43 +43,111 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="catalog.js"></script>
   <script>
-    // 주소의 ?id= 값으로 products.json에서 제품을 찾아 상세를 그립니다. (수정할 필요 없음)
-    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-    const id = new URLSearchParams(location.search).get("id");
-    fetch("products.json")
-      .then((r) => r.json())
-      .then((data) => {
-        const p = data.products.find((x) => x.id === id) || data.products[0];
-        if (!p) throw new Error("no product");
-        document.title = p.name + " — 제품 상세";
+    const productId = new URLSearchParams(location.search).get("id");
 
-        const imgs = (p.images || [])
-          .map((src) => '<div class="look-img" style="margin-bottom:14px;"><img src="' + esc(src) + '" alt="' + esc(p.name) + '" onerror="this.parentElement.style.display=\'none\'" /></div>')
+    function imageMarkup(source, alt, className, eager) {
+      const safeSource = ProductCatalog.safeImageUrl(source);
+      if (!safeSource) return "";
+      return '<img class="' + className + '" src="' + ProductCatalog.escapeHtml(safeSource) +
+        '" alt="' + ProductCatalog.escapeHtml(alt || "") + '" loading="' + (eager ? "eager" : "lazy") +
+        '" onerror="this.parentElement.classList.add(\'product-image-placeholder\');this.remove()" />';
+    }
+
+    function renderSection(section, product, index) {
+      if (!section || !section.type) return "";
+      const esc = ProductCatalog.escapeHtml;
+      const rich = ProductCatalog.sanitizeRichText;
+
+      if (section.type === "rich_text") {
+        return '<section class="product-block product-rich-text">' + rich(section.body) + "</section>";
+      }
+
+      if (section.type === "full_image") {
+        const image = imageMarkup(section.image, section.alt || product.name, "", false);
+        if (!image) return "";
+        const caption = section.caption ? "<figcaption>" + esc(section.caption) + "</figcaption>" : "";
+        return '<figure class="product-block product-full-image">' + image + caption + "</figure>";
+      }
+
+      if (section.type === "image_text") {
+        const image = imageMarkup(section.image, section.heading || product.name, "", false);
+        const heading = section.heading ? "<h2>" + esc(section.heading) + "</h2>" : "";
+        const reverse = section.imagePosition === "right" ? " reverse" : "";
+        return '<section class="product-block product-image-text' + reverse + '">' +
+          '<div class="product-block-image">' + image + "</div>" +
+          '<div class="product-block-copy">' + heading + rich(section.body) + "</div></section>";
+      }
+
+      if (section.type === "gallery") {
+        const columns = ["1", "2", "3"].includes(String(section.columns)) ? String(section.columns) : "2";
+        const images = (Array.isArray(section.images) ? section.images : [])
+          .map((source, imageIndex) => '<figure>' + imageMarkup(source, product.name + " 상세 이미지 " + (imageIndex + 1), "", false) + "</figure>")
           .join("");
-        const paras = (p.description || "")
-          .split("\n\n")
-          .map((t) => "<p>" + esc(t).replace(/\n/g, "<br />") + "</p>")
-          .join("");
-        const tags = (p.keywords || []).map((k) => "<span>" + esc(k) + "</span>").join("");
-        const buy = p.buyLink
-          ? '<p style="margin-top:20px;"><a class="btn" href="' + esc(p.buyLink) + '" target="_blank">구매하기</a></p>'
+        return images ? '<section class="product-block product-gallery columns-' + columns + '">' + images + "</section>" : "";
+      }
+
+      if (section.type === "highlight") {
+        const heading = section.heading ? "<h2>" + esc(section.heading) + "</h2>" : "";
+        return '<aside class="product-block product-highlight">' + heading + rich(section.body) + "</aside>";
+      }
+
+      return "";
+    }
+
+    ProductCatalog.loadVisibleProducts()
+      .then((products) => {
+        const product = products.find((item) => item.id === productId);
+        if (!product) throw new Error("제품을 찾을 수 없습니다.");
+
+        document.title = product.name + " — 제품 상세";
+        const descriptionMeta = document.querySelector('meta[name="description"]');
+        if (descriptionMeta) descriptionMeta.content = product.summary || product.name;
+
+        const esc = ProductCatalog.escapeHtml;
+        const images = Array.isArray(product.images) ? product.images : [];
+        const gallery = images.map((source, index) =>
+          '<figure class="product-hero-image">' + imageMarkup(source, product.name + " 이미지 " + (index + 1), "", index === 0) + "</figure>"
+        ).join("") || '<div class="product-hero-image product-image-placeholder"></div>';
+
+        const tags = (Array.isArray(product.keywords) ? product.keywords : [])
+          .map((keyword) => "<span>" + esc(keyword) + "</span>").join("");
+        const price = product.price ? '<p class="product-price">' + esc(product.price) + "</p>" : "";
+        const buyLink = ProductCatalog.safeExternalUrl(product.buyLink);
+        const buyButton = buyLink
+          ? '<a class="btn product-buy" href="' + esc(buyLink) + '" target="_blank" rel="noopener noreferrer">' +
+            esc(product.buyLabel || "구매하기") + " <span aria-hidden=\"true\">↗</span></a>"
           : "";
 
+        let sections = Array.isArray(product.sections)
+          ? product.sections.map((section, index) => renderSection(section, product, index)).join("")
+          : "";
+
+        // 예전 products.json의 description도 상세 내용으로 안전하게 표시합니다.
+        if (!sections && product.description) {
+          const paragraphs = String(product.description).split("\n\n")
+            .map((text) => "<p>" + esc(text).replace(/\n/g, "<br />") + "</p>").join("");
+          sections = '<section class="product-block product-rich-text">' + paragraphs + "</section>";
+        }
+
         document.getElementById("product-detail").innerHTML =
-          '<div class="look">' +
-          "<div>" + (imgs || '<div class="look-img"></div>') + "</div>" +
-          "<div>" +
-          '<p class="k">' + esc(p.label || "") + "</p>" +
-          "<h3>" + esc(p.name) + "</h3>" +
-          paras +
-          '<div class="tags">' + tags + "</div>" +
-          buy +
-          "</div></div>";
+          '<section class="section product-hero">' +
+            '<div class="product-hero-gallery">' + gallery + "</div>" +
+            '<div class="product-info">' +
+              '<p class="k">' + esc(product.label || product.category || "") + "</p>" +
+              "<h1>" + esc(product.name) + "</h1>" +
+              '<p class="product-summary">' + esc(product.summary || "") + "</p>" +
+              price +
+              (tags ? '<div class="tags">' + tags + "</div>" : "") +
+              buyButton +
+            "</div>" +
+          "</section>" +
+          (sections ? '<div class="product-story">' + sections + "</div>" : "");
       })
       .catch(() => {
         document.getElementById("product-detail").innerHTML =
-          "<p>제품을 찾을 수 없습니다. <a href='products.html'>제품 목록으로</a></p>";
+          '<section class="section"><h1>제품을 찾을 수 없습니다.</h1><p><a href="products.html">제품 목록으로 돌아가기</a></p></section>';
       });
   </script>
 </body>
