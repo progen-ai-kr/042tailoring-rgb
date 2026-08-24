@@ -200,8 +200,8 @@ button { color: inherit; }
 .sidebar-toggle-icon { min-width: 10px; font-size: 16px; line-height: 1; }
 .editor-content { width: min(100% - 28px, 2200px); margin: 22px auto 80px; }
 .panel { margin-bottom: 14px; padding: 22px 18px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
-.editor-content > .panel:not(.detail-panel),
-.danger-zone { width: min(100%, 920px); margin-right: auto; margin-left: auto; }
+.editor-content > .panel,
+.danger-zone { width: 100%; }
 .publish-panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; }
 .toggle-copy strong { display: block; font-size: 13px; }
 .toggle-copy span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.5; }
