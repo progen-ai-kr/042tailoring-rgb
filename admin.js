@@ -484,7 +484,7 @@
         ["heading", "bold", "italic", "strike"],
         ["hr", "quote"],
         ["ul", "ol"],
-        ["link", "image"],
+        ["image", "link"],
         [createVideoToolbarItem(() => editor, product)],
       ],
       customHTMLRenderer: videoHtmlRenderer(),

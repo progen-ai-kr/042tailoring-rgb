@@ -15,10 +15,7 @@
         "Keyword",
         "Keyword"
       ],
-      "images": [
-        "images/look01-1.jpg",
-        "images/look01-2.jpg"
-      ],
+      "images": [],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
@@ -41,9 +38,7 @@
         "Keyword",
         "Keyword"
       ],
-      "images": [
-        "images/look02-1.jpg"
-      ],
+      "images": [],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
@@ -66,9 +61,7 @@
         "Keyword",
         "Keyword"
       ],
-      "images": [
-        "images/look03-1.jpg"
-      ],
+      "images": [],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
@@ -91,9 +84,7 @@
         "Keyword",
         "Keyword"
       ],
-      "images": [
-        "images/look04-1.jpg"
-      ],
+      "images": [],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [

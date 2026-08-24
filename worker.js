@@ -16,6 +16,10 @@ export default {
       return standaloneAdminAsset(request, env, url);
     }
 
+    if (url.pathname.startsWith("/images/products/")) {
+      return repositoryImageAsset(request, env, url, () => env.ASSETS.fetch(request));
+    }
+
     if (!url.pathname.startsWith("/api/admin/")) {
       return env.ASSETS.fetch(request);
     }
@@ -35,13 +39,16 @@ async function standaloneAdminAsset(request, env, url) {
     return Response.redirect(`${url.origin}/admin`, 302);
   }
 
-  if (url.pathname.startsWith("/images/") && env.PUBLIC_SITE_URL) {
-    try {
-      const target = new URL(url.pathname + url.search, `${String(env.PUBLIC_SITE_URL).replace(/\/+$/, "")}/`);
-      return fetch(target, { headers: { Accept: request.headers.get("Accept") || "*/*" } });
-    } catch (_) {
-      return new Response("이미지를 불러올 수 없습니다.", { status: 502 });
-    }
+  if (url.pathname.startsWith("/images/")) {
+    return repositoryImageAsset(request, env, url, async () => {
+      if (!env.PUBLIC_SITE_URL) return new Response("이미지를 찾을 수 없습니다.", { status: 404 });
+      try {
+        const target = new URL(url.pathname + url.search, `${String(env.PUBLIC_SITE_URL).replace(/\/+$/, "")}/`);
+        return fetch(target, { headers: { Accept: request.headers.get("Accept") || "*/*" } });
+      } catch (_) {
+        return new Response("이미지를 불러올 수 없습니다.", { status: 502 });
+      }
+    });
   }
 
   const allowed = url.pathname === "/admin" ||
@@ -57,6 +64,46 @@ async function standaloneAdminAsset(request, env, url) {
     });
   }
   return env.ASSETS.fetch(request);
+}
+
+async function repositoryImageAsset(request, env, url, fallback) {
+  if (request.method !== "GET" && request.method !== "HEAD") return fallback();
+  const path = url.pathname.replace(/^\/+/, "");
+  const safePath = /^images\/[a-z0-9._%+~\/-]+$/i.test(path) && !path.split("/").includes("..") ? path : "";
+  const contentType = imageContentType(safePath);
+  if (!safePath || !contentType || !env.GITHUB_TOKEN || !env.GITHUB_OWNER || !primaryRepository(env)) return fallback();
+
+  try {
+    const response = await fetch(gitHubContentsUrl(env, safePath, true, primaryRepository(env)), {
+      headers: {
+        ...gitHubHeaders(env),
+        Accept: "application/vnd.github.raw+json",
+      },
+    });
+    if (!response.ok) return fallback();
+    const headers = new Headers({
+      "Content-Type": contentType,
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "X-Content-Type-Options": "nosniff",
+    });
+    const etag = response.headers.get("ETag");
+    if (etag) headers.set("ETag", etag);
+    return new Response(request.method === "HEAD" ? null : response.body, { status: 200, headers });
+  } catch (_) {
+    return fallback();
+  }
+}
+
+function imageContentType(path) {
+  const extension = path.split(".").pop().toLowerCase();
+  return ({
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    avif: "image/avif",
+  })[extension] || "";
 }
 
 async function handleAdminApi(request, env, url) {
