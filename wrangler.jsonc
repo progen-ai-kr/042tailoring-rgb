@@ -15,6 +15,6 @@
     "GITHUB_BRANCH": "main",
     "GITHUB_REPOS": "042tailoring-aiai,042tailoring-rgb",
     "ADMIN_ENABLED": "false",
-    "ADMIN_URL": "https://042tailoring-aiai.progen-web.workers.dev/admin"
+    "ADMIN_URL": "https://042tailoring-admin.progen-web.workers.dev/admin"
   }
 }

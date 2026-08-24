@@ -3,6 +3,7 @@
   "use strict";
 
   const brandName = String(window.BRAND_SITE && window.BRAND_SITE.name || "브랜드").trim() || "브랜드";
+  const publicSiteUrl = String(window.BRAND_SITE && window.BRAND_SITE.siteUrl || "").trim();
   document.title = `${brandName} 제품 관리`;
   document.querySelectorAll("[data-brand-name]").forEach((element) => {
     element.textContent = brandName;
@@ -359,7 +360,7 @@
     if (!product) return;
 
     elements.editorProductName.textContent = product.name || "제품 편집";
-    elements.preview.href = `product.html?id=${encodeURIComponent(product.id)}`;
+    elements.preview.href = productPreviewUrl(product.id);
     elements.productForm.querySelectorAll("[data-field]").forEach((input) => {
       const field = input.dataset.field;
       if (input.type === "checkbox") input.checked = Boolean(product[field]);
@@ -760,6 +761,16 @@
     const source = String(path || "");
     if (/^https?:\/\//i.test(source)) return source;
     return `/${source.replace(/^\.?\//, "")}`;
+  }
+
+  function productPreviewUrl(productId) {
+    const relative = `product.html?id=${encodeURIComponent(productId)}`;
+    if (!publicSiteUrl) return relative;
+    try {
+      return new URL(relative, `${publicSiteUrl.replace(/\/+$/, "")}/`).href;
+    } catch (_) {
+      return relative;
+    }
   }
 
   function escapeEditorText(value) {

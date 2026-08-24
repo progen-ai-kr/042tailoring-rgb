@@ -223,9 +223,17 @@
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="brand-config.js"></script>
+  <script>
+    (function () {
+      const adminUrl = String(window.BRAND_SITE && window.BRAND_SITE.adminUrl || "").trim();
+      if (!adminUrl) return;
+      const target = new URL(adminUrl, window.location.href);
+      if (target.origin !== window.location.origin) window.location.replace(target.href);
+    })();
+  </script>
   <script src="vendor/toastui/toastui-editor-all.min.js"></script>
   <script src="vendor/toastui/ko-kr.js"></script>
-  <script src="brand-config.js"></script>
   <script src="admin.js" defer></script>
 </body>
 </html>

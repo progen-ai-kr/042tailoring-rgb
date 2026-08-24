@@ -8,5 +8,5 @@ AGENTS.md
 README.md
 admin-config.json
 worker.js
-wrangler.jsonc
+wrangler*.jsonc
 제품등록_안내.md

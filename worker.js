@@ -12,6 +12,10 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (env.ADMIN_STANDALONE === "true" && !url.pathname.startsWith("/api/admin/")) {
+      return standaloneAdminAsset(request, env, url);
+    }
+
     if (!url.pathname.startsWith("/api/admin/")) {
       return env.ASSETS.fetch(request);
     }
@@ -25,6 +29,35 @@ export default {
     }
   },
 };
+
+async function standaloneAdminAsset(request, env, url) {
+  if (url.pathname === "/") {
+    return Response.redirect(`${url.origin}/admin`, 302);
+  }
+
+  if (url.pathname.startsWith("/images/") && env.PUBLIC_SITE_URL) {
+    try {
+      const target = new URL(url.pathname + url.search, `${String(env.PUBLIC_SITE_URL).replace(/\/+$/, "")}/`);
+      return fetch(target, { headers: { Accept: request.headers.get("Accept") || "*/*" } });
+    } catch (_) {
+      return new Response("이미지를 불러올 수 없습니다.", { status: 502 });
+    }
+  }
+
+  const allowed = url.pathname === "/admin" ||
+    url.pathname === "/admin.html" ||
+    url.pathname === "/admin.css" ||
+    url.pathname === "/admin.js" ||
+    url.pathname === "/brand-config.js" ||
+    url.pathname.startsWith("/vendor/toastui/");
+  if (!allowed) {
+    return new Response("Not Found", {
+      status: 404,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+  }
+  return env.ASSETS.fetch(request);
+}
 
 async function handleAdminApi(request, env, url) {
   if (env.ADMIN_ENABLED === "false") {
