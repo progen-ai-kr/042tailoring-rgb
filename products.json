@@ -10,11 +10,23 @@
       "summary": "목록에 보이는 한 줄 소개",
       "category": "Collection",
       "price": "",
-      "keywords": ["Keyword", "Keyword", "Keyword"],
-      "images": ["images/look01-1.jpg", "images/look01-2.jpg"],
+      "keywords": [
+        "Keyword",
+        "Keyword",
+        "Keyword"
+      ],
+      "images": [
+        "images/look01-1.jpg",
+        "images/look01-2.jpg"
+      ],
       "buyLabel": "구매하기",
       "buyLink": "",
-      "sections": [{ "type": "rich_text", "body": "" }]
+      "sections": [
+        {
+          "type": "rich_text",
+          "body": ""
+        }
+      ]
     },
     {
       "id": "look-02",
@@ -25,11 +37,21 @@
       "summary": "목록에 보이는 한 줄 소개",
       "category": "Collection",
       "price": "",
-      "keywords": ["Keyword", "Keyword"],
-      "images": ["images/look02-1.jpg"],
+      "keywords": [
+        "Keyword",
+        "Keyword"
+      ],
+      "images": [
+        "images/look02-1.jpg"
+      ],
       "buyLabel": "구매하기",
       "buyLink": "",
-      "sections": [{ "type": "rich_text", "body": "" }]
+      "sections": [
+        {
+          "type": "rich_text",
+          "body": ""
+        }
+      ]
     },
     {
       "id": "look-03",
@@ -40,11 +62,21 @@
       "summary": "목록에 보이는 한 줄 소개",
       "category": "Collection",
       "price": "",
-      "keywords": ["Keyword", "Keyword"],
-      "images": ["images/look03-1.jpg"],
+      "keywords": [
+        "Keyword",
+        "Keyword"
+      ],
+      "images": [
+        "images/look03-1.jpg"
+      ],
       "buyLabel": "구매하기",
       "buyLink": "",
-      "sections": [{ "type": "rich_text", "body": "" }]
+      "sections": [
+        {
+          "type": "rich_text",
+          "body": ""
+        }
+      ]
     },
     {
       "id": "look-04",
@@ -55,11 +87,21 @@
       "summary": "목록에 보이는 한 줄 소개",
       "category": "Collection",
       "price": "",
-      "keywords": ["Keyword", "Keyword"],
-      "images": ["images/look04-1.jpg"],
+      "keywords": [
+        "Keyword",
+        "Keyword"
+      ],
+      "images": [
+        "images/look04-1.jpg"
+      ],
       "buyLabel": "구매하기",
       "buyLink": "",
-      "sections": [{ "type": "rich_text", "body": "" }]
+      "sections": [
+        {
+          "type": "rich_text",
+          "body": ""
+        }
+      ]
     }
   ]
 }
