@@ -5,11 +5,16 @@
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/admin/*"]
+    "run_worker_first": [
+      "/api/admin/*"
+    ]
   },
   "vars": {
     "GITHUB_OWNER": "progen-ai-kr",
     "GITHUB_REPO": "042tailoring-rgb",
-    "GITHUB_BRANCH": "main"
+    "GITHUB_BRANCH": "main",
+    "GITHUB_REPOS": "042tailoring-aiai,042tailoring-rgb",
+    "ADMIN_ENABLED": "false",
+    "ADMIN_URL": "https://042tailoring-aiai.progen-web.workers.dev/admin"
   }
 }

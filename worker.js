@@ -27,6 +27,13 @@ export default {
 };
 
 async function handleAdminApi(request, env, url) {
+  if (env.ADMIN_ENABLED === "false") {
+    return json({
+      error: "이 사이트의 제품 관리는 대표 관리자 페이지에서 진행해 주세요.",
+      adminUrl: env.ADMIN_URL || "",
+    }, 403);
+  }
+
   if (request.method !== "GET" && !isSameOrigin(request, url)) {
     return json({ error: "허용되지 않은 요청입니다." }, 403);
   }
@@ -58,7 +65,7 @@ async function handleAdminApi(request, env, url) {
   }
 
   if (path === "/api/admin/catalog" && request.method === "GET") {
-    const file = await readGitHubFile(env, "products.json");
+    const file = await readGitHubFile(env, "products.json", primaryRepository(env));
     let catalog;
     try {
       catalog = JSON.parse(file.text);
@@ -71,7 +78,14 @@ async function handleAdminApi(request, env, url) {
   if (path === "/api/admin/catalog" && request.method === "PUT") {
     const body = await readJson(request);
     const normalized = normalizeCatalog(body.catalog);
-    const current = await readGitHubFile(env, "products.json");
+    const repositories = githubRepositories(env);
+    const currentFiles = await Promise.all(
+      repositories.map(async (repository) => ({
+        repository,
+        file: await readGitHubFile(env, "products.json", repository),
+      }))
+    );
+    const current = currentFiles[0].file;
 
     if (!body.expectedSha || body.expectedSha !== current.sha) {
       return json({ error: "다른 곳에서 먼저 수정되었습니다. 새로고침한 뒤 다시 저장해 주세요." }, 409);
@@ -82,8 +96,33 @@ async function handleAdminApi(request, env, url) {
       return json({ error: "제품 데이터가 너무 큽니다. 상세 글이나 제품 수를 줄여 주세요." }, 413);
     }
 
-    const result = await writeGitHubFile(env, "products.json", content, current.sha, "브랜드 제품 정보 수정");
-    return json({ ok: true, sha: result.content.sha, commitUrl: result.commit.html_url });
+    // 복제 사이트를 먼저 갱신하고 대표 사이트를 마지막에 저장해 대표 관리 화면의 SHA를 기준으로 유지합니다.
+    const replicaResults = [];
+    for (const target of currentFiles.slice(1)) {
+      replicaResults.push(await writeGitHubFile(
+        env,
+        "products.json",
+        content,
+        target.file.sha,
+        "브랜드 제품 정보 동기화",
+        target.repository
+      ));
+    }
+    const result = await writeGitHubFile(
+      env,
+      "products.json",
+      content,
+      current.sha,
+      "브랜드 제품 정보 수정",
+      currentFiles[0].repository
+    );
+    return json({
+      ok: true,
+      sha: result.content.sha,
+      commitUrl: result.commit.html_url,
+      repositories,
+      replicaCommits: replicaResults.map((item) => item.commit.html_url),
+    });
   }
 
   if (path === "/api/admin/image" && request.method === "POST") {
@@ -186,7 +225,11 @@ async function uploadImage(request, env) {
     .slice(0, 64) || "common";
   const unique = crypto.randomUUID().slice(0, 8);
   const path = `images/products/${productId}/${Date.now()}-${unique}.${extensions[contentType]}`;
-  await writeGitHubBytes(env, path, bytes, `제품 이미지 추가: ${productId}`);
+  const repositories = githubRepositories(env);
+  for (const repository of repositories.slice(1)) {
+    await writeGitHubBytes(env, path, bytes, `제품 이미지 동기화: ${productId}`, repository);
+  }
+  await writeGitHubBytes(env, path, bytes, `제품 이미지 추가: ${productId}`, repositories[0]);
   return json({ ok: true, path });
 }
 
@@ -288,17 +331,17 @@ function cleanImageList(value, maxItems) {
   return Array.isArray(value) ? value.slice(0, maxItems).map(cleanImage).filter(Boolean) : [];
 }
 
-async function readGitHubFile(env, path) {
+async function readGitHubFile(env, path, repository = primaryRepository(env)) {
   ensureGitHubConfig(env);
-  const response = await fetch(gitHubContentsUrl(env, path), { headers: gitHubHeaders(env) });
+  const response = await fetch(gitHubContentsUrl(env, path, true, repository), { headers: gitHubHeaders(env) });
   if (!response.ok) throw await gitHubError(response);
   const data = await response.json();
   return { sha: data.sha, text: decodeBase64(data.content.replace(/\n/g, "")) };
 }
 
-async function writeGitHubFile(env, path, content, sha, message) {
+async function writeGitHubFile(env, path, content, sha, message, repository = primaryRepository(env)) {
   ensureGitHubConfig(env);
-  const response = await fetch(gitHubContentsUrl(env, path, false), {
+  const response = await fetch(gitHubContentsUrl(env, path, false, repository), {
     method: "PUT",
     headers: gitHubHeaders(env),
     body: JSON.stringify({ message, content: encodeBase64(new TextEncoder().encode(content)), sha, branch: env.GITHUB_BRANCH || "main" }),
@@ -307,9 +350,9 @@ async function writeGitHubFile(env, path, content, sha, message) {
   return response.json();
 }
 
-async function writeGitHubBytes(env, path, bytes, message) {
+async function writeGitHubBytes(env, path, bytes, message, repository = primaryRepository(env)) {
   ensureGitHubConfig(env);
-  const response = await fetch(gitHubContentsUrl(env, path, false), {
+  const response = await fetch(gitHubContentsUrl(env, path, false, repository), {
     method: "PUT",
     headers: gitHubHeaders(env),
     body: JSON.stringify({ message, content: encodeBase64(bytes), branch: env.GITHUB_BRANCH || "main" }),
@@ -318,9 +361,21 @@ async function writeGitHubBytes(env, path, bytes, message) {
   return response.json();
 }
 
-function gitHubContentsUrl(env, path, includeRef = true) {
+function githubRepositories(env) {
+  const configured = String(env.GITHUB_REPOS || env.GITHUB_REPO || "")
+    .split(",")
+    .map((repository) => repository.trim())
+    .filter((repository) => /^[a-zA-Z0-9._-]+$/.test(repository));
+  return [...new Set(configured)].slice(0, 3);
+}
+
+function primaryRepository(env) {
+  return githubRepositories(env)[0] || "";
+}
+
+function gitHubContentsUrl(env, path, includeRef = true, repository = primaryRepository(env)) {
   const safePath = path.split("/").map(encodeURIComponent).join("/");
-  const base = `https://api.github.com/repos/${encodeURIComponent(env.GITHUB_OWNER)}/${encodeURIComponent(env.GITHUB_REPO)}/contents/${safePath}`;
+  const base = `https://api.github.com/repos/${encodeURIComponent(env.GITHUB_OWNER)}/${encodeURIComponent(repository)}/contents/${safePath}`;
   return includeRef ? `${base}?ref=${encodeURIComponent(env.GITHUB_BRANCH || "main")}` : base;
 }
 
@@ -335,7 +390,7 @@ function gitHubHeaders(env) {
 }
 
 function ensureGitHubConfig(env) {
-  if (!env.GITHUB_TOKEN || !env.GITHUB_OWNER || !env.GITHUB_REPO) {
+  if (!env.GITHUB_TOKEN || !env.GITHUB_OWNER || !githubRepositories(env).length) {
     throw new HttpError(503, "GitHub 저장 설정이 아직 완료되지 않았습니다.");
   }
 }

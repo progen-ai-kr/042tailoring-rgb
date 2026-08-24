@@ -8,6 +8,15 @@
     element.textContent = brandName;
   });
 
+  const canonicalAdminUrl = String(window.BRAND_SITE && window.BRAND_SITE.adminUrl || "").trim();
+  if (canonicalAdminUrl) {
+    const target = new URL(canonicalAdminUrl, window.location.href);
+    if (target.origin !== window.location.origin) {
+      window.location.replace(target.href);
+      return;
+    }
+  }
+
   const state = {
     catalog: null,
     sha: "",
