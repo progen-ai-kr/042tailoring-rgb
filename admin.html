@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RE:STITCH 제품 관리</title>
+  <title>브랜드 제품 관리</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="vendor/toastui/toastui-editor.min.css" />
   <link rel="stylesheet" href="admin.css" />
@@ -16,7 +16,7 @@
 
   <main id="loginView" class="login-view" hidden>
     <section class="login-card">
-      <p class="login-brand">RE:STITCH</p>
+      <p class="login-brand" data-brand-name>브랜드</p>
       <p class="eyebrow">BRAND ADMIN</p>
       <h1>제품 관리</h1>
       <p class="login-lead">브랜드 담당자에게 전달받은 관리자 비밀번호를 입력하세요.</p>
@@ -37,7 +37,7 @@
   <div id="adminApp" class="admin-app" hidden>
     <header class="admin-header">
       <div>
-        <span class="admin-brand">RE:STITCH</span>
+        <span class="admin-brand" data-brand-name>브랜드</span>
         <span class="admin-title">제품 관리</span>
       </div>
       <div class="header-actions">
@@ -225,6 +225,7 @@
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   <script src="vendor/toastui/toastui-editor-all.min.js"></script>
   <script src="vendor/toastui/ko-kr.js"></script>
+  <script src="brand-config.js"></script>
   <script src="admin.js" defer></script>
 </body>
 </html>

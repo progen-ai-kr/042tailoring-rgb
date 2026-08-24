@@ -85,10 +85,25 @@ a { color: inherit; }
    브랜드 담당자가 편집기에서 만든 상세 내용은 아래 공통 클래스에 맞춰 표시됩니다.
    학생은 이 영역의 CSS를 바꿔 브랜드에 맞는 제품 상세 UI를 디자인하세요. */
 .product-hero { display: grid; grid-template-columns: 1fr; gap: 28px; }
-.product-hero-gallery { display: grid; grid-template-columns: 1fr; gap: 12px; }
-.product-hero-image { min-height: 320px; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
-.product-hero-image img { width: 100%; height: 100%; max-height: 760px; object-fit: cover; }
+.product-hero-gallery { min-width: 0; }
+.product-hero-carousel { position: relative; min-width: 0; }
+.product-carousel-viewport { overflow: hidden; border-radius: var(--radius); touch-action: pan-y; }
+.product-carousel-track { display: flex; transition: transform .42s cubic-bezier(.22, .7, .25, 1); will-change: transform; }
+.product-hero-image { flex: 0 0 100%; min-width: 100%; min-height: 320px; aspect-ratio: 4/5; margin: 0; background: var(--surface); overflow: hidden; }
+.product-hero-image img { width: 100%; height: 100%; object-fit: cover; }
 .product-image-placeholder { aspect-ratio: 3/4; }
+.product-carousel-button { position: absolute; top: 50%; z-index: 2; display: grid; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255,255,255,.55); border-radius: 50%; background: rgba(20,20,20,.72); color: #fff; font-size: 20px; line-height: 1; place-items: center; transform: translateY(-50%); cursor: pointer; backdrop-filter: blur(8px); }
+.product-carousel-button:hover { background: rgba(20,20,20,.92); }
+.product-carousel-button:focus-visible,
+.product-carousel-dot:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.product-carousel-button.previous { left: 12px; }
+.product-carousel-button.next { right: 12px; }
+.product-carousel-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 34px; padding-top: 10px; }
+.product-carousel-count { flex: 0 0 auto; margin: 0; color: var(--ink-soft); font-size: 12px; font-variant-numeric: tabular-nums; }
+.product-carousel-dots { display: flex; overflow-x: auto; align-items: center; justify-content: flex-end; gap: 8px; max-width: 75%; padding: 5px 2px; scrollbar-width: none; }
+.product-carousel-dots::-webkit-scrollbar { display: none; }
+.product-carousel-dot { flex: 0 0 auto; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: var(--line); cursor: pointer; transition: width .2s ease, background .2s ease; }
+.product-carousel-dot[aria-current="true"] { width: 24px; border-radius: 999px; background: var(--ink); }
 .product-info .k { font-size: 11px; letter-spacing: 2px; color: var(--ink-soft); text-transform: uppercase; }
 .product-info h1 { font-family: var(--font-display); font-size: clamp(28px, 8vw, 48px); line-height: 1.2; margin: 8px 0 14px; }
 .product-summary { color: var(--ink-soft); font-size: 16px; }
@@ -161,8 +176,6 @@ a { color: inherit; }
   .look.reverse .look-img { order: 2; }
   .product-hero { grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); align-items: start; gap: 52px; }
   .product-info { position: sticky; top: 100px; padding-top: 20px; }
-  .product-hero-gallery:has(.product-hero-image:nth-child(2)) { grid-template-columns: repeat(2, 1fr); }
-  .product-hero-gallery:has(.product-hero-image:nth-child(2)) .product-hero-image:first-child { grid-column: 1 / -1; }
   .product-block { margin-bottom: 90px; }
   .product-image-text { grid-template-columns: 1fr 1fr; gap: 64px; }
   .product-image-text.reverse .product-block-image { order: 2; }
@@ -171,4 +184,8 @@ a { color: inherit; }
   .product-gallery.columns-3 { grid-template-columns: repeat(3, 1fr); }
   .product-highlight { padding: 64px; }
   .contact-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-carousel-track { transition: none; }
 }

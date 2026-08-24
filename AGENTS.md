@@ -19,7 +19,7 @@
 ## 제품 시스템 (중요 — 학생은 UI, 브랜드는 콘텐츠)
 - **브랜드 담당자**가 사이트의 `/admin`에서 제품 등록·수정·삭제, 상세페이지 내용, 외부 구매 링크를 관리합니다.
 - **학생은 제품 데이터나 관리자 기능을 만들지 않고 UI/UX만 디자인**합니다.
-- 제품 데이터는 `products.json`, 비밀번호 해시는 `admin-config.json`, 브랜드 편집 화면은 `admin.html`·`admin.css`·`admin.js`, 저장과 인증은 `worker.js`, 안전한 공개 렌더링은 `catalog.js`가 담당합니다.
+- 제품 데이터는 `products.json`, 비밀번호 해시는 `admin-config.json`, 관리자 브랜드명은 `brand-config.js`, 브랜드 편집 화면은 `admin.html`·`admin.css`·`admin.js`, 저장과 인증은 `worker.js`, 안전한 공개 렌더링은 `catalog.js`가 담당합니다.
 - `products.html`은 공개 제품 목록, `product.html?id=`는 브랜드가 편집기에서 작성한 제품별 상세 내용을 자동 렌더링합니다.
 - 학생은 `products.html`, `product.html`, `style.css`의 제품 카드·상세페이지 CSS를 자유롭게 개선할 수 있습니다.
 - 제품을 HTML에 하드코딩하거나 `products.json` 필드명을 바꾸지 마세요. **데이터와 표현을 분리**하세요.
@@ -52,6 +52,7 @@
 - **`wrangler.jsonc`·`worker.js`** — 배포·로그인·저장 API 설정입니다.
 - **`products.json`** — 브랜드 담당자가 관리하는 운영 데이터입니다. 학생 작업 중 샘플 문구·제품을 하드코딩하지 마세요.
 - **`admin-config.json`** — 관리자 비밀번호 해시와 세션 버전입니다. 직접 수정하거나 공개하지 마세요.
+- **`brand-config.js`** — 관리자 화면의 브랜드명 설정입니다. 운영진 요청 없이 수정하지 마세요.
 - **`catalog.js`의 보안 함수** — 외부 구매 링크·이미지·리치 텍스트를 안전하게 처리합니다.
 - **`admin.html`·`admin.css`·`admin.js`** — 브랜드 담당자 전용 제품 편집기입니다.
 - `.git` 폴더 및 배포 관련 설정.
