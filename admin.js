@@ -3,7 +3,8 @@
   "use strict";
 
   const brandName = String(window.BRAND_SITE && window.BRAND_SITE.name || "브랜드").trim() || "브랜드";
-  const publicSiteUrl = String(window.BRAND_SITE && window.BRAND_SITE.siteUrl || "").trim();
+  const siteChoices = normalizeSiteChoices(window.BRAND_SITE);
+  const publicSiteUrl = siteChoices[0]?.url || "";
   document.title = `${brandName} 제품 관리`;
   document.querySelectorAll("[data-brand-name]").forEach((element) => {
     element.textContent = brandName;
@@ -41,6 +42,7 @@
     app: $("#adminApp"),
     changePassword: $("#changePasswordButton"),
     logout: $("#logoutButton"),
+    siteView: $("#siteViewLink"),
     saveState: $("#saveState"),
     sidebar: $("#productSidebar"),
     productCount: $("#productCount"),
@@ -71,8 +73,14 @@
     passwordError: $("#passwordError"),
     passwordCancel: $("#passwordCancelButton"),
     passwordSubmit: $("#passwordSubmitButton"),
+    siteChoiceDialog: $("#siteChoiceDialog"),
+    siteChoiceTitle: $("#siteChoiceTitle"),
+    siteChoiceList: $("#siteChoiceList"),
+    siteChoiceClose: $("#siteChoiceCloseButton"),
     toast: $("#toast"),
   };
+
+  elements.siteView.href = sitePageUrl("products.html");
 
   boot();
 
@@ -97,6 +105,15 @@
     elements.changePassword.addEventListener("click", openPasswordDialog);
     elements.passwordForm.addEventListener("submit", handlePasswordChange);
     elements.passwordCancel.addEventListener("click", closePasswordDialog);
+    elements.siteView.addEventListener("click", (event) => handleSiteChoice(event, "products.html", "사이트를 확인할 팀 선택"));
+    elements.preview.addEventListener("click", (event) => {
+      const product = currentProduct();
+      if (product) handleSiteChoice(event, `product.html?id=${encodeURIComponent(product.id)}`, "공개 페이지를 확인할 팀 선택");
+    });
+    elements.siteChoiceClose.addEventListener("click", () => elements.siteChoiceDialog.close());
+    elements.siteChoiceDialog.addEventListener("click", (event) => {
+      if (event.target === elements.siteChoiceDialog) elements.siteChoiceDialog.close();
+    });
     elements.logout.addEventListener("click", handleLogout);
     elements.newProduct.addEventListener("click", addProduct);
     elements.productSearch.addEventListener("input", renderProductList);
@@ -764,13 +781,52 @@
   }
 
   function productPreviewUrl(productId) {
-    const relative = `product.html?id=${encodeURIComponent(productId)}`;
-    if (!publicSiteUrl) return relative;
+    return sitePageUrl(`product.html?id=${encodeURIComponent(productId)}`);
+  }
+
+  function sitePageUrl(relative, siteUrl = publicSiteUrl) {
+    if (!siteUrl) return relative;
     try {
-      return new URL(relative, `${publicSiteUrl.replace(/\/+$/, "")}/`).href;
+      return new URL(relative, `${siteUrl.replace(/\/+$/, "")}/`).href;
     } catch (_) {
       return relative;
     }
+  }
+
+  function normalizeSiteChoices(config) {
+    const configured = Array.isArray(config?.sites) && config.sites.length
+      ? config.sites
+      : [{ team: "사이트", url: config?.siteUrl }];
+    return configured.map((site, index) => {
+      const team = String(site?.team || `팀 ${index + 1}`).trim() || `팀 ${index + 1}`;
+      const source = String(site?.url || "").trim();
+      try {
+        const url = new URL(source);
+        if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+        return { team, url: url.href.replace(/\/+$/, "") };
+      } catch (_) {
+        return null;
+      }
+    }).filter(Boolean);
+  }
+
+  function handleSiteChoice(event, relative, title) {
+    if (siteChoices.length < 2) return;
+    event.preventDefault();
+    elements.siteChoiceTitle.textContent = title;
+    elements.siteChoiceList.replaceChildren();
+    siteChoices.forEach((site) => {
+      const link = create("a", "site-choice-link");
+      link.href = sitePageUrl(relative, site.url);
+      link.target = "_blank";
+      link.rel = "noopener";
+      const teamLabel = /팀$/.test(site.team) ? site.team : `${site.team} 팀`;
+      link.append(create("strong", "", `${teamLabel} ↗`));
+      try { link.append(create("span", "", new URL(site.url).hostname)); } catch (_) {}
+      link.addEventListener("click", () => elements.siteChoiceDialog.close());
+      elements.siteChoiceList.append(link);
+    });
+    elements.siteChoiceDialog.showModal();
   }
 
   function escapeEditorText(value) {

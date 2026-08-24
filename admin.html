@@ -42,7 +42,7 @@
       </div>
       <div class="header-actions">
         <span id="saveState" class="save-state">저장됨</span>
-        <a class="ghost-button desktop-only" href="products.html" target="_blank" rel="noopener">사이트 보기 ↗</a>
+        <a id="siteViewLink" class="ghost-button desktop-only" href="products.html" target="_blank" rel="noopener">사이트 보기 ↗</a>
         <button id="changePasswordButton" class="ghost-button password-button" type="button"><span class="mobile-password-label">비밀번호</span><span class="desktop-password-label">비밀번호 변경</span></button>
         <button id="logoutButton" class="ghost-button" type="button">로그아웃</button>
       </div>
@@ -220,6 +220,18 @@
         <button id="passwordSubmitButton" class="primary-button" type="submit">비밀번호 변경</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="siteChoiceDialog" class="site-choice-dialog">
+    <section class="site-choice-card">
+      <p class="eyebrow">SELECT SITE</p>
+      <h2 id="siteChoiceTitle">팀 사이트 선택</h2>
+      <p class="site-choice-lead">확인할 학생 팀을 선택하세요.</p>
+      <div id="siteChoiceList" class="site-choice-list"></div>
+      <div class="dialog-actions">
+        <button id="siteChoiceCloseButton" class="ghost-button" type="button">닫기</button>
+      </div>
+    </section>
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
