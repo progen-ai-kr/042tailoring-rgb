@@ -629,8 +629,10 @@
 
     elements.imageEditorDialog.dataset.saving = "true";
     elements.imageEditorApply.disabled = true;
-    elements.imageEditorApply.textContent = "이미지 올리는 중…";
+    elements.imageEditorApply.textContent = "수정 반영 중…";
     try {
+      await commitPendingImageEdit(instance);
+      elements.imageEditorApply.textContent = "이미지 올리는 중…";
       const dataUrl = instance.toDataURL({ format: "png" });
       const file = await dataUrlToFile(dataUrl, `edited-${Date.now()}.png`);
       const paths = await uploadFiles([file], product.id);
@@ -659,6 +661,19 @@
         elements.imageEditorApply.textContent = "수정 적용";
       }
     }
+  }
+
+  // TUI Image Editor의 자르기는 하단 도구 안의 작은 '적용'을 눌러야 확정됩니다.
+  // 관리자는 바깥쪽 '수정 적용'만 눌러도 되도록, 남아 있는 자르기 영역을 먼저 반영합니다.
+  async function commitPendingImageEdit(instance) {
+    const cropApply = elements.imageEditorMount.querySelector(".tie-crop-button .apply.active");
+    if (!cropApply || typeof instance.getCropzoneRect !== "function") return;
+    const cropRect = instance.getCropzoneRect();
+    if (!cropRect || cropRect.width <= 0 || cropRect.height <= 0) return;
+    await instance.crop(cropRect);
+    try { instance.stopDrawingMode(); } catch (_) {}
+    try { instance.ui?.resizeEditor(); } catch (_) {}
+    await new Promise((resolve) => requestAnimationFrame(resolve));
   }
 
   async function dataUrlToFile(dataUrl, name) {
