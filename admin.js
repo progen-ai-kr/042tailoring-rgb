@@ -29,6 +29,10 @@
   let toastTimer;
   let detailPreviewMedia;
   let detailPreviewMediaHandler;
+  let detailImageCandidate;
+  let imageEditorInstance;
+  let imageEditTarget;
+  let imageEditorResizeTimer;
   const toastEditors = new Map();
 
   const $ = (selector, parent = document) => parent.querySelector(selector);
@@ -61,7 +65,9 @@
     mainImageDrop: $("#mainImageDrop"),
     mainImageGrid: $("#mainImageGrid"),
     mainImageEmpty: $("#mainImageEmpty"),
+    detailEditorShell: $("#detailEditorShell"),
     detailEditorMount: $("#detailEditorMount"),
+    detailImageEdit: $("#detailImageEditButton"),
     deleteProduct: $("#deleteProductButton"),
     passwordDialog: $("#passwordDialog"),
     passwordForm: $("#passwordForm"),
@@ -77,6 +83,13 @@
     siteChoiceTitle: $("#siteChoiceTitle"),
     siteChoiceList: $("#siteChoiceList"),
     siteChoiceClose: $("#siteChoiceCloseButton"),
+    imageEditorDialog: $("#imageEditorDialog"),
+    imageEditorTitle: $("#imageEditorTitle"),
+    imageEditorLead: $("#imageEditorLead"),
+    imageEditorMount: $("#imageEditorMount"),
+    imageEditorClose: $("#imageEditorCloseButton"),
+    imageEditorCancel: $("#imageEditorCancelButton"),
+    imageEditorApply: $("#imageEditorApplyButton"),
     toast: $("#toast"),
   };
 
@@ -129,6 +142,25 @@
     });
     elements.mainImageEmpty.addEventListener("click", () => elements.mainImageInput.click());
     elements.mainImageGrid.addEventListener("click", handleMainImageAction);
+    // TUI Editor가 미리보기 내부 이벤트 전파를 막더라도 이미지 수정 버튼이 뜨도록
+    // 캡처 단계에서 먼저 감지합니다.
+    elements.detailEditorMount.addEventListener("mouseover", handleDetailImageHover, true);
+    elements.detailEditorMount.addEventListener("click", handleDetailImageHover, true);
+    elements.detailEditorMount.addEventListener("scroll", hideDetailImageEditButton, true);
+    elements.detailImageEdit.addEventListener("click", () => {
+      if (detailImageCandidate) openImageEditor(detailImageCandidate);
+    });
+    elements.imageEditorClose.addEventListener("click", closeImageEditor);
+    elements.imageEditorCancel.addEventListener("click", closeImageEditor);
+    elements.imageEditorApply.addEventListener("click", applyImageEdit);
+    elements.imageEditorDialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeImageEditor();
+    });
+    elements.imageEditorDialog.addEventListener("click", (event) => {
+      if (event.target === elements.imageEditorDialog) closeImageEditor();
+    });
+    window.addEventListener("resize", scheduleImageEditorResize);
     elements.mainImageDrop.addEventListener("dragover", (event) => {
       event.preventDefault();
       elements.mainImageDrop.classList.add("dragging");
@@ -422,6 +454,7 @@
     const actions = create("div", "image-actions");
     if (index > 0) actions.append(actionButton("←", `${scope}-left`, index, "앞으로 이동"));
     if (index < length - 1) actions.append(actionButton("→", `${scope}-right`, index, "뒤로 이동"));
+    actions.append(actionButton("수정", `${scope}-edit`, index, "이미지 편집기로 수정"));
     actions.append(actionButton("×", `${scope}-remove`, index, "이미지 제거"));
     card.append(actions);
     return card;
@@ -433,6 +466,7 @@
     button.dataset.imageAction = action;
     button.dataset.imageIndex = String(index);
     button.title = title;
+    if (action.endsWith("-edit")) button.classList.add("image-edit-action");
     return button;
   }
 
@@ -451,6 +485,16 @@
     if (!button || !product) return;
     const index = Number(button.dataset.imageIndex);
     const action = button.dataset.imageAction;
+    if (action.endsWith("edit")) {
+      openImageEditor({
+        kind: "main",
+        productId: product.id,
+        index,
+        source: product.images[index],
+        name: `${product.name || "제품"} 대표 이미지`,
+      });
+      return;
+    }
     if (action.endsWith("remove")) product.images.splice(index, 1);
     if (action.endsWith("left") && index > 0) [product.images[index - 1], product.images[index]] = [product.images[index], product.images[index - 1]];
     if (action.endsWith("right") && index < product.images.length - 1) [product.images[index + 1], product.images[index]] = [product.images[index], product.images[index + 1]];
@@ -459,8 +503,251 @@
     renderProductList();
   }
 
+  // 상세 편집기의 미리보기 이미지 위에 실제로 누를 수 있는 수정 버튼을 띄웁니다.
+  function handleDetailImageHover(event) {
+    const image = event.target.closest?.(".toastui-editor-contents img");
+    if (!image || !elements.detailEditorMount.contains(image)) return;
+    const content = image.closest(".toastui-editor-contents");
+    const index = [...content.querySelectorAll("img")].indexOf(image);
+    const source = image.getAttribute("src") || image.currentSrc || image.src;
+    const product = currentProduct();
+    if (!product || index < 0 || !source) return;
+
+    detailImageCandidate = {
+      kind: "detail",
+      productId: product.id,
+      index,
+      source,
+      name: image.alt || `${product.name || "제품"} 상세 이미지`,
+    };
+
+    const shellRect = elements.detailEditorShell.getBoundingClientRect();
+    const imageRect = image.getBoundingClientRect();
+    elements.detailImageEdit.hidden = false;
+    elements.detailImageEdit.style.top = `${Math.max(8, imageRect.top - shellRect.top + 10)}px`;
+    elements.detailImageEdit.style.left = `${Math.min(shellRect.width - 8, imageRect.right - shellRect.left - 10)}px`;
+  }
+
+  function hideDetailImageEditButton() {
+    detailImageCandidate = null;
+    elements.detailImageEdit.hidden = true;
+  }
+
+  async function openImageEditor(target) {
+    if (!window.tui?.ImageEditor) {
+      showToast("이미지 편집기를 불러오지 못했습니다. 페이지를 새로고침해 주세요.", true);
+      return;
+    }
+    if (!target?.source) return;
+
+    destroyImageEditorInstance();
+    imageEditTarget = target;
+    hideDetailImageEditButton();
+    elements.imageEditorTitle.textContent = target.kind === "main" ? "대표·갤러리 이미지 수정" : "상세페이지 이미지 수정";
+    elements.imageEditorLead.textContent = "자르기·크기·회전·필터·텍스트 도구를 사용한 뒤 ‘수정 적용’을 누르세요.";
+    elements.imageEditorApply.disabled = true;
+    elements.imageEditorApply.textContent = "이미지 준비 중…";
+    if (!elements.imageEditorDialog.open) elements.imageEditorDialog.showModal();
+
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    let objectUrl = "";
+    try {
+      const instance = new window.tui.ImageEditor(elements.imageEditorMount, {
+        includeUI: {
+          loadImage: { path: "", name: "" },
+          locale: imageEditorLocale(),
+          theme: imageEditorTheme(),
+          menu: ["resize", "crop", "flip", "rotate", "draw", "shape", "icon", "text", "filter"],
+          initMenu: "crop",
+          uiSize: { width: "100%", height: "100%" },
+          menuBarPosition: "bottom",
+        },
+        cssMaxWidth: Math.max(320, elements.imageEditorMount.clientWidth),
+        cssMaxHeight: Math.max(320, elements.imageEditorMount.clientHeight),
+        selectionStyle: {
+          cornerSize: window.innerWidth < 720 ? 28 : 16,
+          rotatingPointOffset: window.innerWidth < 720 ? 48 : 70,
+        },
+        usageStatistics: false,
+      });
+      imageEditorInstance = instance;
+
+      const response = await fetch(new URL(imageUrl(target.source), window.location.href), { credentials: "same-origin" });
+      if (!response.ok) throw new Error("원본 이미지를 불러오지 못했습니다.");
+      const blob = await response.blob();
+      objectUrl = URL.createObjectURL(blob);
+      await instance.loadImageFromURL(objectUrl, target.name || "제품 이미지");
+      if (imageEditorInstance !== instance || !elements.imageEditorDialog.open) return;
+      instance.clearUndoStack();
+      instance.ui.activeMenuEvent();
+      instance.ui.resizeEditor();
+      elements.imageEditorApply.disabled = false;
+      elements.imageEditorApply.textContent = "수정 적용";
+    } catch (error) {
+      destroyImageEditorInstance();
+      elements.imageEditorApply.disabled = true;
+      elements.imageEditorApply.textContent = "수정 적용";
+      showToast(error.message || "이미지 편집기를 열지 못했습니다.", true);
+    } finally {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    }
+  }
+
+  function closeImageEditor() {
+    if (elements.imageEditorDialog.dataset.saving === "true") return;
+    if (elements.imageEditorDialog.open) elements.imageEditorDialog.close();
+    destroyImageEditorInstance();
+    imageEditTarget = null;
+  }
+
+  function destroyImageEditorInstance() {
+    window.clearTimeout(imageEditorResizeTimer);
+    if (imageEditorInstance) {
+      try { imageEditorInstance.destroy(); } catch (_) {}
+    }
+    imageEditorInstance = null;
+    elements.imageEditorMount.replaceChildren();
+  }
+
+  function scheduleImageEditorResize() {
+    if (!elements.imageEditorDialog.open || !imageEditorInstance?.ui) return;
+    window.clearTimeout(imageEditorResizeTimer);
+    imageEditorResizeTimer = window.setTimeout(() => {
+      try { imageEditorInstance?.ui?.resizeEditor(); } catch (_) {}
+    }, 100);
+  }
+
+  async function applyImageEdit() {
+    const instance = imageEditorInstance;
+    const target = imageEditTarget;
+    if (!instance || !target) return;
+    const product = state.catalog?.products?.find((item) => item.id === target.productId);
+    if (!product) {
+      showToast("수정할 제품을 찾지 못했습니다.", true);
+      return;
+    }
+
+    elements.imageEditorDialog.dataset.saving = "true";
+    elements.imageEditorApply.disabled = true;
+    elements.imageEditorApply.textContent = "이미지 올리는 중…";
+    try {
+      const dataUrl = instance.toDataURL({ format: "png" });
+      const file = await dataUrlToFile(dataUrl, `edited-${Date.now()}.png`);
+      const paths = await uploadFiles([file], product.id);
+      const path = paths[0];
+      if (!path) return;
+
+      if (target.kind === "main") {
+        if (target.index >= product.images.length) throw new Error("수정할 대표 이미지를 찾지 못했습니다.");
+        product.images[target.index] = path;
+        renderMainImages();
+        renderProductList();
+      } else {
+        replaceDetailImage(target, path, product);
+      }
+
+      setDirty(true);
+      delete elements.imageEditorDialog.dataset.saving;
+      closeImageEditor();
+      showToast("수정한 이미지를 반영했습니다. 마지막으로 변경사항을 저장해 주세요.");
+    } catch (error) {
+      showToast(error.message || "수정한 이미지를 처리하지 못했습니다.", true);
+    } finally {
+      delete elements.imageEditorDialog.dataset.saving;
+      if (elements.imageEditorDialog.open) {
+        elements.imageEditorApply.disabled = false;
+        elements.imageEditorApply.textContent = "수정 적용";
+      }
+    }
+  }
+
+  async function dataUrlToFile(dataUrl, name) {
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+    return new File([blob], name, { type: blob.type || "image/png", lastModified: Date.now() });
+  }
+
+  function replaceDetailImage(target, path, product) {
+    const editor = toastEditors.get("detail");
+    if (!editor) throw new Error("상세 편집기를 찾지 못했습니다.");
+    const documentBody = new DOMParser().parseFromString(editor.getHTML(), "text/html").body;
+    const images = [...documentBody.querySelectorAll("img")];
+    let image = images[target.index];
+    if (!image || !sameImageSource(image.getAttribute("src"), target.source)) {
+      image = images.find((candidate) => sameImageSource(candidate.getAttribute("src"), target.source));
+    }
+    if (!image) throw new Error("수정할 상세 이미지를 찾지 못했습니다.");
+    image.setAttribute("src", imageUrl(path));
+    if (target.name) image.setAttribute("alt", target.name);
+    const html = sanitizeEditorHtml(documentBody.innerHTML);
+    editor.setHTML(html, false);
+    product.sections = singleDetailSection(editor.getHTML());
+    hideDetailImageEditButton();
+  }
+
+  function sameImageSource(left, right) {
+    try {
+      return new URL(String(left || ""), window.location.href).href === new URL(String(right || ""), window.location.href).href;
+    } catch (_) {
+      return String(left || "") === String(right || "");
+    }
+  }
+
+  function imageEditorLocale() {
+    return {
+      Resize: "크기",
+      Crop: "자르기",
+      Flip: "뒤집기",
+      Rotate: "회전",
+      Draw: "그리기",
+      Shape: "도형",
+      Icon: "아이콘",
+      Text: "텍스트",
+      Filter: "필터",
+      Undo: "실행 취소",
+      Redo: "다시 실행",
+      Reset: "초기화",
+      Delete: "삭제",
+      "Delete-all": "전체 삭제",
+      Apply: "적용",
+      Cancel: "취소",
+      Custom: "직접 지정",
+      Square: "정사각형",
+      "Flip X": "좌우 뒤집기",
+      "Flip Y": "상하 뒤집기",
+      Range: "범위",
+      Free: "자유",
+      Straight: "직선",
+      Color: "색상",
+      Grayscale: "흑백",
+      Invert: "반전",
+      Sepia: "세피아",
+      Sharpen: "선명하게",
+      Emboss: "엠보스",
+      Blur: "흐리게",
+      Brightness: "밝기",
+      Noise: "노이즈",
+      Pixelate: "픽셀",
+    };
+  }
+
+  function imageEditorTheme() {
+    return {
+      "common.backgroundColor": "#1f1f1f",
+      "menu.backgroundColor": "#171717",
+      "submenu.backgroundColor": "#ffffff",
+      "menu.normalIcon.color": "#a8a8a8",
+      "menu.activeIcon.color": "#ffffff",
+      "menu.disabledIcon.color": "#555555",
+      "menu.hoverIcon.color": "#ffffff",
+      "submenu.normalIcon.color": "#555555",
+      "submenu.activeIcon.color": "#111111",
+    };
+  }
+
   function renderDetailEditor() {
     const product = currentProduct();
+    hideDetailImageEditButton();
     destroyToastEditors();
     elements.detailEditorMount.replaceChildren();
     if (!product) return;

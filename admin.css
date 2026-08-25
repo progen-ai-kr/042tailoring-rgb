@@ -253,12 +253,32 @@ button { color: inherit; }
 .image-badge { position: absolute; top: 7px; left: 7px; padding: 4px 7px; border-radius: 999px; background: rgba(0,0,0,.72); color: white; font-size: 8px; font-weight: 800; }
 .image-actions { position: absolute; right: 5px; bottom: 5px; left: 5px; display: flex; justify-content: flex-end; gap: 3px; }
 .image-actions button { display: grid; width: 28px; height: 28px; place-items: center; border: 0; border-radius: 7px; background: rgba(255,255,255,.92); font-size: 11px; cursor: pointer; }
+.image-actions .image-edit-action { width: auto; padding: 0 10px; background: var(--ink); color: white; font-weight: 800; }
 .upload-empty { display: grid; min-height: 134px; place-items: center; align-content: center; padding: 22px; text-align: center; cursor: pointer; }
 .upload-empty span { display: grid; width: 36px; height: 36px; margin-bottom: 8px; place-items: center; border: 1px solid var(--line-dark); border-radius: 50%; font-size: 18px; }
 .upload-empty strong { font-size: 12px; }
 .upload-empty small { margin-top: 5px; color: var(--muted); font-size: 9px; }
 
 .detail-helper { margin: -8px 0 18px 38px; }
+.detail-editor-shell { position: relative; min-width: 0; }
+.detail-image-edit-button {
+  position: absolute;
+  z-index: 12;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.75);
+  border-radius: 8px;
+  background: rgba(24,24,21,.9);
+  color: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  font-size: 11px;
+  font-weight: 850;
+  transform: translateX(-100%);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.toast-editor-mount .toastui-editor-contents img { cursor: pointer; transition: outline-color .15s, opacity .15s; }
+.toast-editor-mount .toastui-editor-contents img:hover { outline: 3px solid rgba(36,37,31,.28); outline-offset: 3px; opacity: .94; }
 .toast-editor-mount { min-width: 0; }
 .toast-editor-mount .toastui-editor-defaultUI { overflow: hidden; border-color: var(--line); border-radius: 10px; background: var(--surface); }
 .toast-editor-mount .toastui-editor-toolbar { background: #f7f6f2; }
@@ -294,6 +314,39 @@ button { color: inherit; }
 .detail-video-popup-error { margin: 7px 0 0; color: var(--danger); font-size: 10px; }
 .detail-video-popup-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 14px; }
 .toastui-editor-defaultUI .detail-video-popup-actions button { width: auto; min-width: 68px; height: 32px; margin: 0; padding: 0 12px; }
+
+.image-editor-dialog {
+  width: min(1480px, calc(100% - 18px));
+  max-width: none;
+  height: calc(100dvh - 18px);
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: 0 24px 90px rgba(0,0,0,.32);
+}
+.image-editor-dialog::backdrop { background: rgba(15,15,14,.76); backdrop-filter: blur(5px); }
+.image-editor-card { display: grid; height: 100%; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; background: #f5f4ef; }
+.image-editor-dialog-header,
+.image-editor-dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 15px; background: var(--surface); }
+.image-editor-dialog-header { border-bottom: 1px solid var(--line); }
+.image-editor-dialog-header h2 { margin: 0; font-size: 18px; letter-spacing: -.035em; }
+.image-editor-dialog-header p:last-child { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.image-editor-close { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); font-size: 22px; line-height: 1; cursor: pointer; }
+.image-editor-stage { min-width: 0; min-height: 360px; height: 100%; background: #1f1f1f; }
+.image-editor-dialog-footer { align-items: flex-start; border-top: 1px solid var(--line); }
+.image-editor-dialog-footer > p { max-width: 680px; margin: 4px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.image-editor-dialog-actions { flex: 0 0 auto; margin-top: 0; }
+.image-editor-stage .tui-image-editor-container { min-height: 0; }
+.image-editor-stage .tui-image-editor-header { display: none; }
+.image-editor-stage .tui-image-editor-main { top: 0; }
+.image-editor-stage .tui-image-editor-controls { overflow-x: auto; overflow-y: hidden; }
+.image-editor-stage .tui-image-editor-menu { min-width: max-content; }
+.image-editor-stage .tui-image-editor-menu > .tui-image-editor-item { margin-right: 1px; margin-left: 1px; }
+.image-editor-stage .tui-image-editor-menu > .tui-image-editor-item label { font-family: inherit; }
+.image-editor-stage .tui-image-editor-submenu { overflow-x: auto; overflow-y: hidden; }
 .danger-zone { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 19px 4px; }
 .danger-zone strong { font-size: 12px; }
 .danger-zone p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
@@ -331,6 +384,13 @@ body:not(.editor-open) .editor-main { display: none; }
   .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
   .span-2 { grid-column: span 2; }
   .image-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .image-editor-dialog { width: min(1480px, calc(100% - 32px)); height: calc(100dvh - 32px); border-radius: 22px; }
+  .image-editor-card { border-radius: 22px; }
+  .image-editor-dialog-header,
+  .image-editor-dialog-footer { padding: 15px 20px; }
+  .image-editor-dialog-header h2 { font-size: 21px; }
+  .image-editor-dialog-header p:last-child,
+  .image-editor-dialog-footer > p { font-size: 11px; }
   .mobile-only { display: none; }
   body.editor-open .product-sidebar { display: block; }
   body:not(.editor-open) .editor-main { display: block; }

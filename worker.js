@@ -56,7 +56,8 @@ async function standaloneAdminAsset(request, env, url) {
     url.pathname === "/admin.css" ||
     url.pathname === "/admin.js" ||
     url.pathname === "/brand-config.js" ||
-    url.pathname.startsWith("/vendor/toastui/");
+    url.pathname.startsWith("/vendor/toastui/") ||
+    url.pathname.startsWith("/vendor/tui-image-editor/");
   if (!allowed) {
     return new Response("Not Found", {
       status: 404,

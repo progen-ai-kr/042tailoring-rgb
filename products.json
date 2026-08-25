@@ -15,7 +15,9 @@
         "Keyword",
         "Keyword"
       ],
-      "images": [],
+      "images": [
+        "images/sample-product-bag.jpg"
+      ],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
@@ -38,7 +40,9 @@
         "Keyword",
         "Keyword"
       ],
-      "images": [],
+      "images": [
+        "images/sample-product-bag.jpg"
+      ],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
@@ -61,7 +65,9 @@
         "Keyword",
         "Keyword"
       ],
-      "images": [],
+      "images": [
+        "images/sample-product-bag.jpg"
+      ],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [

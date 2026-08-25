@@ -6,7 +6,9 @@
   <title>브랜드 제품 관리</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="vendor/toastui/toastui-editor.min.css" />
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="vendor/tui-image-editor/tui-color-picker.min.css?v=20260825" />
+  <link rel="stylesheet" href="vendor/tui-image-editor/tui-image-editor.min.css?v=20260825" />
+  <link rel="stylesheet" href="admin.css?v=20260825-image-editor" />
 </head>
 <body>
   <div id="loadingView" class="center-view">
@@ -183,7 +185,10 @@
                 <p>왼쪽에서 작성하고 오른쪽에서 결과를 바로 확인하세요.</p>
               </div>
               <p class="helper detail-helper">글·이미지·링크·영상을 한 편집기 안에서 구성합니다. 화면 아래의 ‘분할 편집’과 ‘블로그 편집’을 필요에 따라 바꿔 사용할 수 있습니다.</p>
-              <div id="detailEditorMount" class="toast-editor-mount detail-editor-mount"></div>
+              <div id="detailEditorShell" class="detail-editor-shell">
+                <div id="detailEditorMount" class="toast-editor-mount detail-editor-mount"></div>
+                <button id="detailImageEditButton" class="detail-image-edit-button" type="button" hidden>이미지 수정</button>
+              </div>
             </section>
 
             <div class="danger-zone">
@@ -234,6 +239,27 @@
     </section>
   </dialog>
 
+  <dialog id="imageEditorDialog" class="image-editor-dialog">
+    <section class="image-editor-card" aria-labelledby="imageEditorTitle">
+      <header class="image-editor-dialog-header">
+        <div>
+          <p class="eyebrow">IMAGE EDITOR</p>
+          <h2 id="imageEditorTitle">이미지 수정</h2>
+          <p id="imageEditorLead">자르기·회전·필터·텍스트 도구로 이미지를 편집하세요.</p>
+        </div>
+        <button id="imageEditorCloseButton" class="image-editor-close" type="button" aria-label="이미지 편집기 닫기">×</button>
+      </header>
+      <div id="imageEditorMount" class="image-editor-stage"></div>
+      <footer class="image-editor-dialog-footer">
+        <p>원본은 그대로 유지됩니다. <strong>수정 적용</strong>을 누르면 편집한 이미지가 새 파일로 올라갑니다.</p>
+        <div class="dialog-actions image-editor-dialog-actions">
+          <button id="imageEditorCancelButton" class="ghost-button" type="button">취소</button>
+          <button id="imageEditorApplyButton" class="primary-button" type="button">수정 적용</button>
+        </div>
+      </footer>
+    </section>
+  </dialog>
+
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   <script src="brand-config.js"></script>
   <script>
@@ -246,6 +272,8 @@
   </script>
   <script src="vendor/toastui/toastui-editor-all.min.js"></script>
   <script src="vendor/toastui/ko-kr.js"></script>
-  <script src="admin.js" defer></script>
+  <script src="vendor/tui-image-editor/tui-color-picker.min.js?v=20260825"></script>
+  <script src="vendor/tui-image-editor/tui-image-editor.min.js?v=20260825"></script>
+  <script src="admin.js?v=20260825-image-editor-2" defer></script>
 </body>
 </html>
