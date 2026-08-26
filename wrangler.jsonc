@@ -8,7 +8,8 @@
     "run_worker_first": [
       "/api/admin/*",
       "/images/products/*",
-      "/images/portfolio/*"
+      "/images/portfolio/*",
+      "/portfolio.json"
     ]
   },
   "vars": {

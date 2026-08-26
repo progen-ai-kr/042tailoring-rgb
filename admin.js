@@ -110,6 +110,7 @@
   };
 
   elements.siteView.href = sitePageUrl("products.html");
+  elements.portfolioPreview.href = sitePageUrl("portfolio.html");
 
   boot();
 

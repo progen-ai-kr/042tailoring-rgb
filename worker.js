@@ -21,6 +21,10 @@ export default {
       return repositoryImageAsset(request, env, url, () => env.ASSETS.fetch(request));
     }
 
+    if (url.pathname === "/portfolio.json" && env.ADMIN_STANDALONE !== "true") {
+      return repositoryJsonAsset(request, env, "portfolio.json", () => env.ASSETS.fetch(request));
+    }
+
     if (!url.pathname.startsWith("/api/admin/")) {
       return env.ASSETS.fetch(request);
     }
@@ -91,6 +95,28 @@ async function repositoryImageAsset(request, env, url, fallback) {
     const etag = response.headers.get("ETag");
     if (etag) headers.set("ETag", etag);
     return new Response(request.method === "HEAD" ? null : response.body, { status: 200, headers });
+  } catch (_) {
+    return fallback();
+  }
+}
+
+// 관리자 저장 직후에도 공개 페이지가 최신 포트폴리오를 읽도록 GitHub 원본을 바로 전달합니다.
+// GitHub가 일시적으로 응답하지 않을 때는 마지막으로 배포된 정적 파일을 대신 사용합니다.
+async function repositoryJsonAsset(request, env, path, fallback) {
+  if (request.method !== "GET" && request.method !== "HEAD") return fallback();
+  if (!env.GITHUB_TOKEN || !env.GITHUB_OWNER || !primaryRepository(env)) return fallback();
+
+  try {
+    const file = await readGitHubFile(env, path, primaryRepository(env));
+    return new Response(request.method === "HEAD" ? null : file.text, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store, max-age=0",
+        "ETag": `\"${file.sha}\"`,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
   } catch (_) {
     return fallback();
   }
