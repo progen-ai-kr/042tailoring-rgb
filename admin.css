@@ -305,8 +305,27 @@ button { color: inherit; }
 .toast-editor-mount { min-width: 0; }
 .toast-editor-mount .toastui-editor-defaultUI { overflow: hidden; border-color: var(--line); border-radius: 10px; background: var(--surface); }
 .toast-editor-mount .toastui-editor-toolbar { background: #f7f6f2; }
+.toast-editor-mount .toastui-editor-defaultUI-toolbar { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+.toast-editor-mount .toastui-editor-toolbar-group { flex: 0 0 auto; }
 .toast-editor-mount .toastui-editor-main { font-family: inherit; }
 .toast-editor-mount .toastui-editor-contents { font-family: inherit; font-size: 14px; line-height: 1.75; }
+.toast-editor-mount .toastui-editor-contents [data-align="left"] { text-align: left; }
+.toast-editor-mount .toastui-editor-contents [data-align="center"] { text-align: center; }
+.toast-editor-mount .toastui-editor-contents [data-align="right"] { text-align: right; }
+.toast-editor-mount .toastui-editor-contents span[data-brand-font="sans"] { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+.toast-editor-mount .toastui-editor-contents span[data-brand-font="serif"] { font-family: Georgia, "Times New Roman", "Noto Serif KR", "Batang", serif; }
+.toast-editor-mount .toastui-editor-contents span[data-brand-font="mono"] { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+.toast-editor-mount .toastui-editor-contents big[data-brand-size] { line-height: 1.45; }
+.toast-editor-mount .toastui-editor-contents big[data-brand-size="14"] { font-size: 14px; }
+.toast-editor-mount .toastui-editor-contents big[data-brand-size="16"] { font-size: 16px; }
+.toast-editor-mount .toastui-editor-contents big[data-brand-size="18"] { font-size: 18px; }
+.toast-editor-mount .toastui-editor-contents big[data-brand-size="24"] { font-size: 24px; }
+.toast-editor-mount .toastui-editor-contents big[data-brand-size="32"] { font-size: 32px; }
+.toast-editor-mount .toastui-editor-contents big[data-brand-size="42"] { font-size: 42px; }
+.toast-editor-mount .toastui-editor-contents section[data-brand-gallery] { display: grid; gap: 10px; width: 100%; margin: 22px 0; }
+.toast-editor-mount .toastui-editor-contents section[data-brand-gallery="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.toast-editor-mount .toastui-editor-contents section[data-brand-gallery="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.toast-editor-mount .toastui-editor-contents section[data-brand-gallery] img { width: 100%; height: auto; margin: 0; }
 .toast-editor-mount .toastui-editor-contents h2 { font-size: 24px; }
 .toast-editor-mount .toastui-editor-contents h3 { font-size: 19px; }
 .toast-editor-mount .toastui-editor-ww-container { background: var(--surface); }
@@ -321,7 +340,15 @@ button { color: inherit; }
 .toast-editor-mount .toastui-editor-contents video { height: auto; }
 .toast-editor-fallback { width: 100%; min-height: 760px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; font: 13px/1.7 monospace; resize: vertical; }
 .toastui-editor-defaultUI-toolbar .detail-video-toolbar-button { width: 46px; background-image: none !important; font-size: 11px !important; font-weight: 800; line-height: 28px; }
+.toastui-editor-defaultUI-toolbar .rich-toolbar-button { width: auto; min-width: 46px; padding: 0 7px; background-image: none !important; font-size: 10px !important; font-weight: 850; line-height: 28px; white-space: nowrap; }
+.toastui-editor-defaultUI-toolbar .gallery-toolbar-button { min-width: 62px; }
 .toastui-editor-popup.detail-video-toolbar-popup { width: min(420px, calc(100% - 20px)); }
+.toastui-editor-popup.rich-choice-toolbar-popup { width: min(340px, calc(100% - 20px)); }
+.rich-choice-popup-body > strong { display: block; color: var(--ink); font-size: 14px; }
+.rich-choice-popup-body > p { margin: 6px 0 13px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.rich-choice-popup-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.toastui-editor-defaultUI .rich-choice-popup-option { width: 100%; height: 36px; margin: 0; border: 1px solid var(--line-dark); border-radius: 7px; background: var(--surface); color: var(--ink); font-size: 11px; font-weight: 750; cursor: pointer; }
+.toastui-editor-defaultUI .rich-choice-popup-option:hover { border-color: var(--ink); background: var(--ink); color: white; }
 .detail-video-popup-body > strong { display: block; color: var(--ink); font-size: 14px; }
 .detail-video-popup-body > p { margin: 6px 0 14px; color: var(--muted); font-size: 11px; line-height: 1.55; }
 .detail-video-popup-form input {
@@ -334,6 +361,10 @@ button { color: inherit; }
   outline: 0;
 }
 .detail-video-popup-form input:focus { border-color: var(--ink); }
+.gallery-popup-form { display: grid; gap: 9px; }
+.gallery-popup-form select,
+.gallery-popup-form input[type="file"] { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line-dark); border-radius: 7px; background: var(--surface); color: var(--ink); }
+.gallery-popup-form input[type="file"] { height: auto; font-size: 11px; }
 .detail-video-popup-error { margin: 7px 0 0; color: var(--danger); font-size: 10px; }
 .detail-video-popup-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 14px; }
 .toastui-editor-defaultUI .detail-video-popup-actions button { width: auto; min-width: 68px; height: 32px; margin: 0; padding: 0 12px; }

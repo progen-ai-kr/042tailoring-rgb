@@ -923,17 +923,16 @@
       autofocus: false,
       usageStatistics: false,
       placeholder: "제품 설명을 작성하고 이미지와 영상을 원하는 순서로 넣어 주세요.",
-      toolbarItems: [
-        ["heading", "bold", "italic", "strike"],
-        ["hr", "quote"],
-        ["ul", "ol"],
-        ["image", "link"],
-        [createVideoToolbarItem(() => editor, () => {
+      toolbarItems: createRichEditorToolbar(
+        () => editor,
+        () => {
           product.sections = singleDetailSection(editor.getHTML());
           setDirty(true);
-        }, "상세페이지")],
-      ],
-      customHTMLRenderer: videoHtmlRenderer(),
+        },
+        () => ({ productId: product.id, scope: "product", label: "상세페이지" })
+      ),
+      plugins: [richTextExtensionPlugin],
+      customHTMLRenderer: richHtmlRenderer(),
       hooks: {
         addImageBlobHook: async (blob, callback) => {
           const paths = await uploadFiles([blob], product.id);
@@ -987,24 +986,23 @@
       el: elements.portfolioEditorMount,
       height: "820px",
       minHeight: "580px",
-      initialEditType: "wysiwyg",
+      initialEditType: "markdown",
       previewStyle: previewMedia.matches ? "vertical" : "tab",
       hideModeSwitch: false,
       language: "ko-KR",
       autofocus: false,
       usageStatistics: false,
       placeholder: "브랜드의 작업과 이야기를 한 페이지로 작성해 주세요.",
-      toolbarItems: [
-        ["heading", "bold", "italic", "strike"],
-        ["hr", "quote"],
-        ["ul", "ol"],
-        ["image", "link"],
-        [createVideoToolbarItem(() => editor, () => {
+      toolbarItems: createRichEditorToolbar(
+        () => editor,
+        () => {
           state.portfolio.body = sanitizeEditorHtml(editor.getHTML());
           setPortfolioDirty(true);
-        }, "포트폴리오")],
-      ],
-      customHTMLRenderer: videoHtmlRenderer(),
+        },
+        () => ({ productId: "portfolio", scope: "portfolio", label: "포트폴리오" })
+      ),
+      plugins: [richTextExtensionPlugin],
+      customHTMLRenderer: richHtmlRenderer(),
       hooks: {
         addImageBlobHook: async (blob, callback) => {
           const paths = await uploadFiles([blob], "portfolio", "portfolio");
@@ -1093,6 +1091,273 @@
   function syncPortfolioEditor() {
     const editor = toastEditors.get("portfolio");
     if (editor) state.portfolio.body = sanitizeEditorHtml(editor.getHTML());
+  }
+
+  // TOAST UI Editor 3.2.2의 기본 툴바는 그대로 제공하고,
+  // 브랜드 실무에 필요한 정렬·폰트·크기·사진 분할·영상만 확장합니다.
+  function createRichEditorToolbar(getEditor, onChange, getUploadContext) {
+    return [
+      ["heading", "bold", "italic", "strike"],
+      ["hr", "quote"],
+      ["ul", "ol", "task", "indent", "outdent"],
+      ["table", "image", "link"],
+      [
+        createChoiceToolbarItem({
+          name: "textAlign",
+          text: "정렬",
+          tooltip: "문단 정렬",
+          title: "문단 정렬",
+          description: "커서가 있는 문단 또는 선택한 여러 문단에 적용됩니다.",
+          options: [
+            { value: "left", label: "왼쪽" },
+            { value: "center", label: "가운데" },
+            { value: "right", label: "오른쪽" },
+          ],
+          onSelect: (value) => applyRichTextCommand(getEditor(), "brandAlign", { align: value }, onChange),
+        }),
+        createChoiceToolbarItem({
+          name: "brandFont",
+          text: "폰트",
+          tooltip: "글꼴 변경",
+          title: "글꼴",
+          description: "글자를 선택한 뒤 원하는 글꼴을 누르세요. 선택하지 않으면 이후 입력부터 적용됩니다.",
+          options: [
+            { value: "default", label: "기본" },
+            { value: "sans", label: "고딕" },
+            { value: "serif", label: "명조" },
+            { value: "mono", label: "모노" },
+          ],
+          onSelect: (value) => applyRichTextCommand(getEditor(), "brandFont", { font: value }, onChange),
+        }),
+        createChoiceToolbarItem({
+          name: "brandSize",
+          text: "크기",
+          tooltip: "글자 크기 변경",
+          title: "글자 크기",
+          description: "본문부터 큰 강조 문구까지 선택한 글자에 적용할 수 있습니다.",
+          options: [
+            { value: "default", label: "기본" },
+            { value: "14", label: "14" },
+            { value: "16", label: "16" },
+            { value: "18", label: "18" },
+            { value: "24", label: "24" },
+            { value: "32", label: "32" },
+            { value: "42", label: "42" },
+          ],
+          onSelect: (value) => applyRichTextCommand(getEditor(), "brandSize", { size: value }, onChange),
+        }),
+      ],
+      [createGalleryToolbarItem(getEditor, onChange, getUploadContext), createVideoToolbarItem(getEditor, onChange, getUploadContext()?.label || "페이지")],
+      ["code", "codeblock"],
+      ["scrollSync"],
+    ];
+  }
+
+  function createChoiceToolbarItem({ name, text, tooltip, title, description, options, onSelect }) {
+    const body = create("div", "rich-choice-popup-body");
+    body.append(create("strong", "", title));
+    body.append(create("p", "", description));
+    const choices = create("div", "rich-choice-popup-options");
+    options.forEach((option) => {
+      const button = create("button", "rich-choice-popup-option", option.label);
+      button.type = "button";
+      button.dataset.value = option.value;
+      choices.append(button);
+    });
+    body.append(choices);
+
+    choices.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-value]");
+      if (!button) return;
+      onSelect(button.dataset.value);
+    });
+
+    return {
+      name,
+      tooltip,
+      text,
+      className: `toastui-editor-toolbar-icons rich-toolbar-button rich-toolbar-${name}`,
+      style: { backgroundImage: "none" },
+      popup: { body, className: "rich-choice-toolbar-popup" },
+    };
+  }
+
+  function applyRichTextCommand(editor, command, payload, onChange) {
+    if (!editor) return;
+    const wasMarkdown = editor.isMarkdownMode();
+    if (wasMarkdown) editor.changeMode("wysiwyg");
+    editor.exec(command, payload);
+    if (wasMarkdown) editor.changeMode("markdown");
+    onChange();
+    editor.eventEmitter.emit("closePopup");
+  }
+
+  function richTextExtensionPlugin() {
+    const allowedAlignments = new Set(["left", "center", "right"]);
+    const allowedFonts = new Set(["sans", "serif", "mono"]);
+    const allowedSizes = new Set(["14", "16", "18", "24", "32", "42"]);
+
+    function setAlignment(payload, state, dispatch) {
+      const align = String(payload?.align || "");
+      if (!allowedAlignments.has(align)) return false;
+      const { selection, doc } = state;
+      const targets = new Map();
+
+      if (selection.empty) {
+        for (let depth = selection.$from.depth; depth > 0; depth -= 1) {
+          const node = selection.$from.node(depth);
+          if (node.type.name === "paragraph" || node.type.name === "heading") {
+            targets.set(selection.$from.before(depth), node);
+            break;
+          }
+        }
+      } else {
+        doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+          if (node.type.name === "paragraph" || node.type.name === "heading") {
+            targets.set(pos, node);
+            return false;
+          }
+          return true;
+        });
+      }
+
+      if (!targets.size) return false;
+      let transaction = state.tr;
+      targets.forEach((node, pos) => {
+        transaction = transaction.setNodeMarkup(pos, undefined, {
+          ...node.attrs,
+          htmlAttrs: { ...(node.attrs.htmlAttrs || {}), "data-align": align },
+        });
+      });
+      dispatch(transaction.scrollIntoView());
+      return true;
+    }
+
+    function setInlineMark(markName, attributeName, allowedValues) {
+      return (payload, state, dispatch) => {
+        const markType = state.schema.marks[markName];
+        const value = String(payload?.[attributeName] || "default");
+        if (!markType || (value !== "default" && !allowedValues.has(value))) return false;
+        const { from, to, empty } = state.selection;
+        let transaction = state.tr;
+
+        if (empty) {
+          transaction = value === "default"
+            ? transaction.removeStoredMark(markType)
+            : transaction.addStoredMark(markType.create({ htmlAttrs: { [`data-brand-${attributeName}`]: value } }));
+        } else {
+          transaction = transaction.removeMark(from, to, markType);
+          if (value !== "default") {
+            transaction = transaction.addMark(from, to, markType.create({
+              htmlAttrs: { [`data-brand-${attributeName}`]: value },
+            }));
+          }
+        }
+        dispatch(transaction.scrollIntoView());
+        return true;
+      };
+    }
+
+    function insertRichBlock(payload, state, dispatch) {
+      const type = state.schema.nodes.section;
+      if (!type || payload?.kind !== "gallery") return false;
+      const columns = ["2", "3"].includes(String(payload.columns)) ? String(payload.columns) : "2";
+      const node = type.createAndFill({
+        htmlAttrs: { "data-brand-gallery": columns },
+        childrenHTML: String(payload.childrenHTML || ""),
+      });
+      if (!node) return false;
+      dispatch(state.tr.replaceSelectionWith(node).scrollIntoView());
+      return true;
+    }
+
+    return {
+      wysiwygCommands: {
+        brandAlign: setAlignment,
+        brandFont: setInlineMark("span", "font", allowedFonts),
+        brandSize: setInlineMark("big", "size", allowedSizes),
+        insertRichBlock,
+      },
+    };
+  }
+
+  function createGalleryToolbarItem(getEditor, onChange, getUploadContext) {
+    const body = create("div", "detail-video-popup-body gallery-popup-body");
+    body.append(create("strong", "", "사진 나란히 넣기"));
+    body.append(create("p", "", "여러 사진을 한 번에 골라 2열 또는 3열로 배치합니다. 모바일에서도 자동으로 맞춰집니다."));
+
+    const form = create("form", "detail-video-popup-form gallery-popup-form");
+    const columns = document.createElement("select");
+    columns.setAttribute("aria-label", "사진 열 수");
+    columns.innerHTML = '<option value="2">2열 배치</option><option value="3">3열 배치</option>';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.required = true;
+    input.setAttribute("aria-label", "나란히 넣을 사진 선택");
+    const error = create("p", "detail-video-popup-error");
+    error.hidden = true;
+    const actions = create("div", "detail-video-popup-actions");
+    const cancel = create("button", "toastui-editor-close-button", "취소");
+    cancel.type = "button";
+    const submit = create("button", "toastui-editor-ok-button", "사진 넣기");
+    submit.type = "submit";
+    actions.append(cancel, submit);
+    form.append(columns, input, error, actions);
+    body.append(form);
+
+    const closePopup = () => {
+      getEditor()?.eventEmitter.emit("closePopup");
+      form.reset();
+      error.hidden = true;
+      submit.disabled = false;
+      submit.textContent = "사진 넣기";
+    };
+    cancel.addEventListener("click", closePopup);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const editor = getEditor();
+      const context = getUploadContext();
+      const files = [...input.files].slice(0, 12);
+      if (!editor || !context || files.length < 2) {
+        error.textContent = "나란히 배치할 사진을 2장 이상 선택해 주세요.";
+        error.hidden = false;
+        return;
+      }
+
+      submit.disabled = true;
+      submit.textContent = "올리는 중…";
+      const paths = await uploadFiles(files, context.productId, context.scope);
+      if (paths.length < 2) {
+        error.textContent = "사진을 올리지 못했습니다. 다시 선택해 주세요.";
+        error.hidden = false;
+        submit.disabled = false;
+        submit.textContent = "사진 넣기";
+        return;
+      }
+
+      const childrenHTML = paths.map((path, index) => {
+        const source = imageUrl(path);
+        return `<img src="${escapeEditorAttribute(source)}" alt="분할 이미지 ${index + 1}">`;
+      }).join("");
+      const columnCount = columns.value === "3" ? "3" : "2";
+      const markup = `<section data-brand-gallery="${columnCount}">${childrenHTML}</section>`;
+      if (editor.isMarkdownMode()) editor.insertText(`\n\n${markup}\n\n`);
+      else editor.exec("insertRichBlock", { kind: "gallery", columns: columnCount, childrenHTML });
+      onChange();
+      closePopup();
+      showToast(`사진 ${paths.length}장을 ${columnCount}열로 ${context.label}에 넣었습니다. 저장하면 사이트에 반영됩니다.`);
+    });
+
+    return {
+      name: "brandGallery",
+      tooltip: "사진 2열·3열 배치",
+      text: "사진분할",
+      className: "toastui-editor-toolbar-icons rich-toolbar-button gallery-toolbar-button",
+      style: { backgroundImage: "none" },
+      popup: { body, className: "detail-video-toolbar-popup gallery-toolbar-popup" },
+    };
   }
 
   function createVideoToolbarItem(getEditor, onInsert, contextLabel) {
@@ -1455,7 +1720,9 @@
     return fileSource ? `<video src="${escapeEditorAttribute(fileSource)}" controls preload="metadata"></video>` : "";
   }
 
-  function videoHtmlRenderer() {
+  function richHtmlRenderer() {
+    const allowedFonts = new Set(["sans", "serif", "mono"]);
+    const allowedSizes = new Set(["14", "16", "18", "24", "32", "42"]);
     return {
       htmlBlock: {
         iframe(node) {
@@ -1490,12 +1757,66 @@
             { type: "closeTag", tagName: "video", outerNewLine: true },
           ];
         },
+        section(node) {
+          const columns = String(node.attrs?.["data-brand-gallery"] || "");
+          const safeColumns = columns === "3" ? "3" : "2";
+          const images = safeGalleryImagesHtml(node.childrenHTML);
+          if (!images) return { type: "text", content: "" };
+          return [
+            {
+              type: "openTag",
+              tagName: "section",
+              outerNewLine: true,
+              attributes: { "data-brand-gallery": safeColumns },
+            },
+            { type: "html", content: images },
+            { type: "closeTag", tagName: "section", outerNewLine: true },
+          ];
+        },
+      },
+      htmlInline: {
+        span(node, { entering }) {
+          const font = String(node.attrs?.["data-brand-font"] || "");
+          return entering
+            ? {
+                type: "openTag",
+                tagName: "span",
+                attributes: allowedFonts.has(font) ? { "data-brand-font": font } : {},
+              }
+            : { type: "closeTag", tagName: "span" };
+        },
+        big(node, { entering }) {
+          const size = String(node.attrs?.["data-brand-size"] || "");
+          return entering
+            ? {
+                type: "openTag",
+                tagName: "big",
+                attributes: allowedSizes.has(size) ? { "data-brand-size": size } : {},
+              }
+            : { type: "closeTag", tagName: "big" };
+        },
       },
     };
   }
 
+  function safeGalleryImagesHtml(value) {
+    const template = document.createElement("template");
+    template.innerHTML = String(value || "");
+    return [...template.content.querySelectorAll("img")].slice(0, 12).map((image, index) => {
+      const source = safeEditorImageUrl(image.getAttribute("src"));
+      if (!source) return "";
+      const alt = image.getAttribute("alt") || `분할 이미지 ${index + 1}`;
+      return `<img src="${escapeEditorAttribute(source)}" alt="${escapeEditorAttribute(alt)}">`;
+    }).join("");
+  }
+
   function sanitizeEditorHtml(value) {
-    const allowed = new Set(["P", "BR", "H2", "H3", "H4", "STRONG", "B", "EM", "I", "S", "UL", "OL", "LI", "BLOCKQUOTE", "A", "IMG", "FIGURE", "FIGCAPTION", "HR", "IFRAME", "VIDEO"]);
+    const allowed = new Set([
+      "P", "BR", "H1", "H2", "H3", "H4", "H5", "H6", "STRONG", "B", "EM", "I", "S", "DEL",
+      "UL", "OL", "LI", "INPUT", "BLOCKQUOTE", "A", "IMG", "FIGURE", "FIGCAPTION", "HR",
+      "TABLE", "THEAD", "TBODY", "TR", "TH", "TD", "PRE", "CODE", "IFRAME", "VIDEO",
+      "SECTION", "SPAN", "BIG"
+    ]);
     const template = document.createElement("template");
     template.innerHTML = String(value || "");
     function clean(parent) {
@@ -1510,7 +1831,21 @@
         const href = node.getAttribute("href") || "";
         const source = node.getAttribute("src") || "";
         const alt = node.getAttribute("alt") || "";
+        const align = node.getAttribute("data-align") || "";
+        const galleryColumns = node.getAttribute("data-brand-gallery") || "";
+        const font = node.getAttribute("data-brand-font") || "";
+        const size = node.getAttribute("data-brand-size") || "";
+        const colspan = node.getAttribute("colspan") || "";
+        const rowspan = node.getAttribute("rowspan") || "";
+        const cellAlign = node.getAttribute("align") || "";
+        const listStart = node.getAttribute("start") || "";
+        const task = node.hasAttribute("data-task");
+        const taskChecked = node.hasAttribute("data-task-checked");
+        const checked = node.hasAttribute("checked");
         [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
+        if (["P", "H1", "H2", "H3", "H4", "H5", "H6"].includes(node.tagName) && ["left", "center", "right"].includes(align)) {
+          node.setAttribute("data-align", align);
+        }
         if (node.tagName === "A" && /^https?:\/\//i.test(href)) node.setAttribute("href", href);
         if (node.tagName === "IMG") {
           const safeSource = safeEditorImageUrl(source);
@@ -1542,6 +1877,45 @@
           node.setAttribute("src", safeSource);
           node.setAttribute("controls", "");
           node.setAttribute("preload", "metadata");
+        }
+        if (node.tagName === "SECTION") {
+          if (!["2", "3"].includes(galleryColumns)) {
+            node.replaceWith(...node.childNodes);
+            clean(parent);
+            return;
+          }
+          node.setAttribute("data-brand-gallery", galleryColumns);
+        }
+        if (node.tagName === "SPAN") {
+          if (!["sans", "serif", "mono"].includes(font)) {
+            node.replaceWith(...node.childNodes);
+            clean(parent);
+            return;
+          }
+          node.setAttribute("data-brand-font", font);
+        }
+        if (node.tagName === "BIG") {
+          if (!["14", "16", "18", "24", "32", "42"].includes(size)) {
+            node.replaceWith(...node.childNodes);
+            clean(parent);
+            return;
+          }
+          node.setAttribute("data-brand-size", size);
+        }
+        if (["TH", "TD"].includes(node.tagName)) {
+          if (/^[1-9]\d?$/.test(colspan)) node.setAttribute("colspan", colspan);
+          if (/^[1-9]\d?$/.test(rowspan)) node.setAttribute("rowspan", rowspan);
+          if (["left", "center", "right"].includes(cellAlign)) node.setAttribute("align", cellAlign);
+        }
+        if (node.tagName === "OL" && /^\d{1,4}$/.test(listStart)) node.setAttribute("start", listStart);
+        if (node.tagName === "LI" && task) {
+          node.setAttribute("data-task", "");
+          if (taskChecked) node.setAttribute("data-task-checked", "");
+        }
+        if (node.tagName === "INPUT") {
+          node.setAttribute("type", "checkbox");
+          node.setAttribute("disabled", "");
+          if (checked) node.setAttribute("checked", "");
         }
         clean(node);
       });

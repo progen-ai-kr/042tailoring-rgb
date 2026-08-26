@@ -4,8 +4,10 @@
   "use strict";
 
   const ALLOWED_RICH_TAGS = new Set([
-    "P", "BR", "H2", "H3", "H4", "STRONG", "EM", "S", "UL", "OL", "LI",
-    "BLOCKQUOTE", "A", "IMG", "FIGURE", "FIGCAPTION", "HR", "IFRAME", "VIDEO"
+    "P", "BR", "H1", "H2", "H3", "H4", "H5", "H6", "STRONG", "B", "EM", "I", "S", "DEL",
+    "UL", "OL", "LI", "INPUT", "BLOCKQUOTE", "A", "IMG", "FIGURE", "FIGCAPTION", "HR",
+    "TABLE", "THEAD", "TBODY", "TR", "TH", "TD", "PRE", "CODE", "IFRAME", "VIDEO",
+    "SECTION", "SPAN", "BIG"
   ]);
 
   const escapeHtml = (value) => String(value == null ? "" : value).replace(
@@ -79,7 +81,22 @@
         const hrefValue = node.getAttribute("href");
         const sourceValue = node.getAttribute("src");
         const altValue = node.getAttribute("alt") || "";
+        const alignValue = node.getAttribute("data-align") || "";
+        const galleryValue = node.getAttribute("data-brand-gallery") || "";
+        const fontValue = node.getAttribute("data-brand-font") || "";
+        const sizeValue = node.getAttribute("data-brand-size") || "";
+        const colspanValue = node.getAttribute("colspan") || "";
+        const rowspanValue = node.getAttribute("rowspan") || "";
+        const cellAlignValue = node.getAttribute("align") || "";
+        const listStartValue = node.getAttribute("start") || "";
+        const taskValue = node.hasAttribute("data-task");
+        const taskCheckedValue = node.hasAttribute("data-task-checked");
+        const checkedValue = node.hasAttribute("checked");
         [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
+
+        if (["P", "H1", "H2", "H3", "H4", "H5", "H6"].includes(node.tagName) && ["left", "center", "right"].includes(alignValue)) {
+          node.setAttribute("data-align", alignValue);
+        }
 
         if (node.tagName === "A") {
           const href = safeExternalUrl(hrefValue);
@@ -125,6 +142,50 @@
           node.setAttribute("src", source);
           node.setAttribute("controls", "");
           node.setAttribute("preload", "metadata");
+        }
+
+        if (node.tagName === "SECTION") {
+          if (!["2", "3"].includes(galleryValue)) {
+            node.replaceWith(...node.childNodes);
+            clean(parent);
+            return;
+          }
+          node.setAttribute("data-brand-gallery", galleryValue);
+        }
+
+        if (node.tagName === "SPAN") {
+          if (!["sans", "serif", "mono"].includes(fontValue)) {
+            node.replaceWith(...node.childNodes);
+            clean(parent);
+            return;
+          }
+          node.setAttribute("data-brand-font", fontValue);
+        }
+
+        if (node.tagName === "BIG") {
+          if (!["14", "16", "18", "24", "32", "42"].includes(sizeValue)) {
+            node.replaceWith(...node.childNodes);
+            clean(parent);
+            return;
+          }
+          node.setAttribute("data-brand-size", sizeValue);
+        }
+
+        if (["TH", "TD"].includes(node.tagName)) {
+          if (/^[1-9]\d?$/.test(colspanValue)) node.setAttribute("colspan", colspanValue);
+          if (/^[1-9]\d?$/.test(rowspanValue)) node.setAttribute("rowspan", rowspanValue);
+          if (["left", "center", "right"].includes(cellAlignValue)) node.setAttribute("align", cellAlignValue);
+        }
+
+        if (node.tagName === "OL" && /^\d{1,4}$/.test(listStartValue)) node.setAttribute("start", listStartValue);
+        if (node.tagName === "LI" && taskValue) {
+          node.setAttribute("data-task", "");
+          if (taskCheckedValue) node.setAttribute("data-task-checked", "");
+        }
+        if (node.tagName === "INPUT") {
+          node.setAttribute("type", "checkbox");
+          node.setAttribute("disabled", "");
+          if (checkedValue) node.setAttribute("checked", "");
         }
 
         clean(node);

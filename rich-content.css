@@ -1,0 +1,222 @@
+/*
+ * 관리자 TOAST UI Editor에서 만든 공통 서식입니다.
+ * 학생 팀의 페이지 레이아웃과 색상은 style.css가 담당하고,
+ * 이 파일은 편집기에서 지정한 제목·효과·정렬·사진 분할만 정확히 재현합니다.
+ */
+.portfolio-content,
+.product-rich-text {
+  overflow-wrap: anywhere;
+}
+
+.portfolio-content h1,
+.product-rich-text h1 {
+  margin: 1.35em 0 .55em;
+  font-size: clamp(2rem, 6vw, 3.125rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.portfolio-content h2,
+.product-rich-text h2 {
+  margin: 1.3em 0 .55em;
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.portfolio-content h3,
+.product-rich-text h3 {
+  margin: 1.2em 0 .5em;
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.portfolio-content h4,
+.product-rich-text h4 {
+  margin: 1.15em 0 .45em;
+  font-size: 1.2rem;
+  font-weight: 750;
+}
+
+.portfolio-content h5,
+.product-rich-text h5 {
+  margin: 1.1em 0 .4em;
+  font-size: 1.075rem;
+  font-weight: 700;
+}
+
+.portfolio-content h6,
+.product-rich-text h6 {
+  margin: 1em 0 .35em;
+  font-size: .95rem;
+  font-weight: 700;
+}
+
+.portfolio-content strong,
+.portfolio-content b,
+.product-rich-text strong,
+.product-rich-text b {
+  font-weight: 800;
+}
+
+.portfolio-content em,
+.portfolio-content i,
+.product-rich-text em,
+.product-rich-text i {
+  font-style: italic;
+}
+
+.portfolio-content s,
+.portfolio-content del,
+.product-rich-text s,
+.product-rich-text del {
+  text-decoration: line-through;
+}
+
+.portfolio-content [data-align="left"],
+.product-rich-text [data-align="left"] {
+  text-align: left;
+}
+
+.portfolio-content [data-align="center"],
+.product-rich-text [data-align="center"] {
+  text-align: center;
+}
+
+.portfolio-content [data-align="right"],
+.product-rich-text [data-align="right"] {
+  text-align: right;
+}
+
+.portfolio-content span[data-brand-font="sans"],
+.product-rich-text span[data-brand-font="sans"] {
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+.portfolio-content span[data-brand-font="serif"],
+.product-rich-text span[data-brand-font="serif"] {
+  font-family: Georgia, "Times New Roman", "Noto Serif KR", Batang, serif;
+}
+
+.portfolio-content span[data-brand-font="mono"],
+.product-rich-text span[data-brand-font="mono"] {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+.portfolio-content big[data-brand-size],
+.product-rich-text big[data-brand-size] {
+  line-height: 1.45;
+}
+
+.portfolio-content big[data-brand-size="14"],
+.product-rich-text big[data-brand-size="14"] { font-size: 14px; }
+.portfolio-content big[data-brand-size="16"],
+.product-rich-text big[data-brand-size="16"] { font-size: 16px; }
+.portfolio-content big[data-brand-size="18"],
+.product-rich-text big[data-brand-size="18"] { font-size: 18px; }
+.portfolio-content big[data-brand-size="24"],
+.product-rich-text big[data-brand-size="24"] { font-size: 24px; }
+.portfolio-content big[data-brand-size="32"],
+.product-rich-text big[data-brand-size="32"] { font-size: 32px; }
+.portfolio-content big[data-brand-size="42"],
+.product-rich-text big[data-brand-size="42"] { font-size: 42px; }
+
+.portfolio-content section[data-brand-gallery],
+.product-rich-text section[data-brand-gallery] {
+  display: grid;
+  gap: clamp(6px, 1.3vw, 14px);
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.portfolio-content section[data-brand-gallery="2"],
+.product-rich-text section[data-brand-gallery="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.portfolio-content section[data-brand-gallery="3"],
+.product-rich-text section[data-brand-gallery="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.portfolio-content section[data-brand-gallery] img,
+.product-rich-text section[data-brand-gallery] img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+.portfolio-content table,
+.product-rich-text table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  margin: 1.75rem 0;
+  border-collapse: collapse;
+}
+
+.portfolio-content th,
+.portfolio-content td,
+.product-rich-text th,
+.product-rich-text td {
+  min-width: 110px;
+  padding: .65rem .75rem;
+  border: 1px solid var(--line, #deddd6);
+}
+
+.portfolio-content th,
+.product-rich-text th {
+  background: var(--surface, #f5f4ef);
+  font-weight: 800;
+}
+
+.portfolio-content pre,
+.product-rich-text pre {
+  overflow-x: auto;
+  margin: 1.6rem 0;
+  padding: 1.1rem;
+  border-radius: var(--radius, 8px);
+  background: #242522;
+  color: #f6f5ef;
+}
+
+.portfolio-content code,
+.product-rich-text code {
+  padding: .12em .3em;
+  border-radius: 4px;
+  background: var(--surface, #f5f4ef);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: .9em;
+}
+
+.portfolio-content pre code,
+.product-rich-text pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.portfolio-content li[data-task],
+.product-rich-text li[data-task] {
+  position: relative;
+  list-style: none;
+}
+
+.portfolio-content li[data-task] > input,
+.product-rich-text li[data-task] > input {
+  margin-right: .5rem;
+}
+
+@media (max-width: 599px) {
+  .portfolio-content section[data-brand-gallery="3"],
+  .product-rich-text section[data-brand-gallery="3"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portfolio-content section[data-brand-gallery="3"] > img:last-child:nth-child(odd),
+  .product-rich-text section[data-brand-gallery="3"] > img:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
