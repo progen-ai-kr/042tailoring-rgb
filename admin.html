@@ -167,19 +167,24 @@
 
             <section class="panel">
               <div class="panel-heading">
-                <div><span class="step-number">03</span><h2>외부 구매 링크</h2></div>
-                <p>구매 링크를 비워두면 버튼이 표시되지 않습니다.</p>
+                <div><span class="step-number">03</span><h2>구매 버튼</h2></div>
+                <p>상품 주소가 없으면 구매 안내가 팝업으로 열립니다.</p>
               </div>
               <div class="field-grid">
                 <label class="field">
                   <span>버튼 문구</span>
-                  <input type="text" data-field="buyLabel" maxlength="100" placeholder="예: 스마트스토어에서 보기" />
+                  <input type="text" data-field="buyLabel" maxlength="100" placeholder="예: 구매하기" />
                 </label>
                 <label class="field">
-                  <span>상품 주소</span>
+                  <span>외부 상품 주소 <small>(선택)</small></span>
                   <input type="url" data-field="buyLink" maxlength="2000" placeholder="https://smartstore.naver.com/..." />
                 </label>
+                <label class="field span-2">
+                  <span>구매 안내 팝업 내용</span>
+                  <textarea data-field="buyNotice" maxlength="4000" rows="6" placeholder="예:&#10;주문을 원하시면 아래 계좌로 입금한 뒤 연락해 주세요.&#10;&#10;은행: ○○은행&#10;계좌: 000-0000-0000&#10;문의: 010-0000-0000"></textarea>
+                </label>
               </div>
+              <p class="helper">외부 상품 주소가 있으면 해당 주소로 이동합니다. 주소가 없고 구매 안내가 있으면 팝업을 표시하며, 둘 다 비어 있으면 버튼을 숨깁니다.</p>
             </section>
 
             <section class="panel detail-panel">
@@ -305,6 +310,6 @@
   <script src="vendor/toastui/ko-kr.js"></script>
   <script src="vendor/tui-image-editor/tui-color-picker.min.js?v=20260825"></script>
   <script src="vendor/tui-image-editor/tui-image-editor.min.js?v=20260825"></script>
-  <script src="admin.js?v=20260826-toolbar-clean-1" defer></script>
+  <script src="admin.js?v=20260826-buy-popup-1" defer></script>
 </body>
 </html>

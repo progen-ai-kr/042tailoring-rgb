@@ -461,6 +461,7 @@ function normalizeProduct(product) {
     images: cleanImageList(product.images, 30),
     buyLabel: cleanText(product.buyLabel, 100),
     buyLink,
+    buyNotice: cleanText(product.buyNotice, 4000),
     sections: Array.isArray(product.sections) ? product.sections.slice(0, 100).map(normalizeSection) : [],
   };
 }

@@ -20,6 +20,7 @@
       ],
       "buyLabel": "구매하기",
       "buyLink": "",
+      "buyNotice": "안녕",
       "sections": [
         {
           "type": "rich_text",
@@ -46,6 +47,7 @@
       ],
       "buyLabel": "구매하기",
       "buyLink": "",
+      "buyNotice": "",
       "sections": [
         {
           "type": "rich_text",
@@ -72,6 +74,7 @@
       ],
       "buyLabel": "구매하기",
       "buyLink": "",
+      "buyNotice": "",
       "sections": [
         {
           "type": "rich_text",

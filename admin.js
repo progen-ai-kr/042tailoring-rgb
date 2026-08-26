@@ -456,6 +456,7 @@
       images: [],
       buyLabel: "구매하기",
       buyLink: "",
+      buyNotice: "",
       sections: [],
     };
     state.catalog.products.unshift(product);
