@@ -1146,7 +1146,6 @@
       ],
       [createGalleryToolbarItem(getEditor, onChange, getUploadContext), createVideoToolbarItem(getEditor, onChange, getUploadContext()?.label || "페이지")],
       ["code", "codeblock"],
-      ["scrollSync"],
     ];
     // 자주 쓰느 글꼴·크기·정렬으 좁은 화면에서도 항상 보이도록 앞에 둡니다.
     const [alignControl, fontControl, sizeControl] = toolbar.splice(4, 1)[0];
