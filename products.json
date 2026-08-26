@@ -5,25 +5,25 @@
       "id": "look-01",
       "published": true,
       "featured": true,
-      "label": "LOOK 01",
-      "name": "제품 이름",
-      "summary": "목록에 보이는 한 줄 소개",
-      "category": "Collection",
+      "label": "WOMEN · CARDIGAN",
+      "name": "다이널 부클 자수 니트 가디건",
+      "summary": "포근한 울 블렌딩 소재와 부클 공룡 자수로 포인트를 준 스탠다드 핏 가디건",
+      "category": "Cardigan",
       "price": "",
       "keywords": [
-        "Keyword",
-        "Keyword",
-        "Keyword"
+        "아이보리 · 그레이 · 네이비",
+        "울 블렌딩",
+        "부클 자수"
       ],
       "images": [
-        "images/sample-product-bag.jpg"
+        "images/products/look-01/1787721859194-2b0dbc5f.webp"
       ],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
         {
           "type": "rich_text",
-          "body": ""
+          "body": "<p><img src=\"images/products/look-01/1787721861860-fcbca1cc.jpg\" alt=\"다이널 부클 자수 니트 가디건 스타일 이미지\"></p><p><img src=\"images/products/look-01/1787721864645-dfa7a337.jpg\" alt=\"다이널 부클 자수 니트 가디건 컬러와 상품 설명\"></p><p><img src=\"images/products/look-01/1787721867694-3d3d0607.jpg\" alt=\"다이널 부클 자수 니트 가디건 디테일 포인트\"></p><p><img src=\"images/products/look-01/1787721870841-2a9b9f75.jpg\" alt=\"다이널 부클 자수 니트 가디건 상품 디테일\"></p><p><img src=\"images/products/look-01/1787721874055-2a708341.jpg\" alt=\"다이널 부클 자수 니트 가디건 사이즈와 소재 정보\"></p>"
         }
       ]
     },
@@ -31,24 +31,25 @@
       "id": "look-02",
       "published": true,
       "featured": true,
-      "label": "LOOK 02",
-      "name": "제품 이름",
-      "summary": "목록에 보이는 한 줄 소개",
-      "category": "Collection",
+      "label": "MEN · KNIT",
+      "name": "남성 트임넥 니트",
+      "summary": "부드러운 니트 텍스처와 단정한 트임넥 디자인을 갖춘 남성 데일리 니트",
+      "category": "Knit",
       "price": "",
       "keywords": [
-        "Keyword",
-        "Keyword"
+        "아이보리 · 연그레이 · 커피 · 진그레이",
+        "트임넥",
+        "M–4XL"
       ],
       "images": [
-        "images/sample-product-02-black-bag.jpg"
+        "images/products/look-02/1787721875951-30515286.webp"
       ],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
         {
           "type": "rich_text",
-          "body": ""
+          "body": "<p><img src=\"images/products/look-02/1787721878184-c17aee33.png\" alt=\"J nd O 브랜드 소개\"></p><p><img src=\"images/products/look-02/1787721879918-f9597545.jpg\" alt=\"남성 트임넥 니트 원단 디테일\"></p><p><img src=\"images/products/look-02/1787721881841-68833463.jpg\" alt=\"남성 트임넥 니트 컬러 구성\"></p><p><img src=\"images/products/look-02/1787721883940-f8521541.png\" alt=\"남성 트임넥 니트 사이즈 표\"></p><p><img src=\"images/products/look-02/1787721885287-19652e08.png\" alt=\"남성 트임넥 니트 측정 안내\"></p>"
         }
       ]
     },
@@ -56,47 +57,25 @@
       "id": "look-03",
       "published": true,
       "featured": true,
-      "label": "LOOK 03",
-      "name": "제품 이름",
-      "summary": "목록에 보이는 한 줄 소개",
-      "category": "Collection",
+      "label": "WOMEN · JACKET",
+      "name": "린넨 크롭 반팔 자켓",
+      "summary": "린넨과 레이온 혼방의 내추럴한 질감이 돋보이는 가벼운 크롭 반팔 자켓",
+      "category": "Jacket",
       "price": "",
       "keywords": [
-        "Keyword",
-        "Keyword"
+        "연베이지 · 블랙",
+        "린넨 혼방",
+        "크롭 기장"
       ],
       "images": [
-        "images/sample-product-03-backpack.jpg"
+        "images/products/look-03/1787721886985-b456d1fb.webp"
       ],
       "buyLabel": "구매하기",
       "buyLink": "",
       "sections": [
         {
           "type": "rich_text",
-          "body": ""
-        }
-      ]
-    },
-    {
-      "id": "look-04",
-      "published": true,
-      "featured": true,
-      "label": "LOOK 04",
-      "name": "제품 이름",
-      "summary": "목록에 보이는 한 줄 소개",
-      "category": "Collection",
-      "price": "",
-      "keywords": [
-        "Keyword",
-        "Keyword"
-      ],
-      "images": [],
-      "buyLabel": "구매하기",
-      "buyLink": "",
-      "sections": [
-        {
-          "type": "rich_text",
-          "body": ""
+          "body": "<p><img src=\"images/products/look-03/1787721889907-d94e9719.jpg\" alt=\"Peilit 브랜드와 배송 안내\"></p><p><img src=\"images/products/look-03/1787721892506-4210ede3.jpg\" alt=\"린넨 크롭 반팔 자켓 상품 설명과 디테일\"></p><p><img src=\"images/products/look-03/1787721896090-1f05ca9b.jpg\" alt=\"연베이지 린넨 크롭 반팔 자켓 착용 이미지\"></p><p><img src=\"images/products/look-03/1787721899623-cb77fedc.jpg\" alt=\"블랙 린넨 크롭 반팔 자켓 착용 이미지\"></p><p><img src=\"images/products/look-03/1787721902234-b79d7bbf.jpg\" alt=\"린넨 크롭 반팔 자켓 상품과 사이즈 정보\"></p>"
         }
       ]
     }
