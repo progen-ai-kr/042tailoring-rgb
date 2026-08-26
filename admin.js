@@ -1096,7 +1096,7 @@
   // TOAST UI Editor 3.2.2의 기본 툴바는 그대로 제공하고,
   // 브랜드 실무에 필요한 정렬·폰트·크기·사진 분할·영상만 확장합니다.
   function createRichEditorToolbar(getEditor, onChange, getUploadContext) {
-    return [
+    const toolbar = [
       ["heading", "bold", "italic", "strike"],
       ["hr", "quote"],
       ["ul", "ol", "task", "indent", "outdent"],
@@ -1104,45 +1104,42 @@
       [
         createChoiceToolbarItem({
           name: "textAlign",
+          variant: "align",
           text: "정렬",
           tooltip: "문단 정렬",
-          title: "문단 정렬",
-          description: "커서가 있는 문단 또는 선택한 여러 문단에 적용됩니다.",
           options: [
-            { value: "left", label: "왼쪽" },
-            { value: "center", label: "가운데" },
-            { value: "right", label: "오른쪽" },
+            { value: "left", label: "왼쪽 정렬", icon: "left" },
+            { value: "center", label: "가운데 정렬", icon: "center" },
+            { value: "right", label: "오른쪽 정렬", icon: "right" },
           ],
           onSelect: (value) => applyRichTextCommand(getEditor(), "brandAlign", { align: value }, onChange),
         }),
         createChoiceToolbarItem({
           name: "brandFont",
-          text: "폰트",
+          variant: "font",
+          text: "글꼴",
           tooltip: "글꼴 변경",
-          title: "글꼴",
-          description: "글자를 선택한 뒤 원하는 글꼴을 누르세요. 선택하지 않으면 이후 입력부터 적용됩니다.",
           options: [
-            { value: "default", label: "기본" },
-            { value: "sans", label: "고딕" },
-            { value: "serif", label: "명조" },
-            { value: "mono", label: "모노" },
+            { value: "default", label: "기본 글꼴" },
+            { value: "sans", label: "고딕", preview: "sans" },
+            { value: "serif", label: "명조", preview: "serif" },
+            { value: "mono", label: "고정폭", preview: "mono" },
           ],
           onSelect: (value) => applyRichTextCommand(getEditor(), "brandFont", { font: value }, onChange),
         }),
         createChoiceToolbarItem({
           name: "brandSize",
+          variant: "size",
           text: "크기",
           tooltip: "글자 크기 변경",
-          title: "글자 크기",
-          description: "본문부터 큰 강조 문구까지 선택한 글자에 적용할 수 있습니다.",
           options: [
-            { value: "default", label: "기본" },
-            { value: "14", label: "14" },
-            { value: "16", label: "16" },
-            { value: "18", label: "18" },
-            { value: "24", label: "24" },
-            { value: "32", label: "32" },
-            { value: "42", label: "42" },
+            { value: "default", label: "기본 크기" },
+            { value: "14", label: "14 px", preview: "14" },
+            { value: "16", label: "16 px", preview: "16" },
+            { value: "18", label: "18 px", preview: "18" },
+            { value: "24", label: "24 px", preview: "24" },
+            { value: "32", label: "32 px", preview: "32" },
+            { value: "42", label: "42 px", preview: "42" },
           ],
           onSelect: (value) => applyRichTextCommand(getEditor(), "brandSize", { size: value }, onChange),
         }),
@@ -1151,17 +1148,41 @@
       ["code", "codeblock"],
       ["scrollSync"],
     ];
+    // 자주 쓰느 글꼴·크기·정렬으 좁은 화면에서도 항상 보이도록 앞에 둡니다.
+    const [alignControl, fontControl, sizeControl] = toolbar.splice(4, 1)[0];
+    toolbar.unshift([fontControl, sizeControl, alignControl]);
+    return toolbar;
   }
 
-  function createChoiceToolbarItem({ name, text, tooltip, title, description, options, onSelect }) {
-    const body = create("div", "rich-choice-popup-body");
-    body.append(create("strong", "", title));
-    body.append(create("p", "", description));
+  function createChoiceToolbarItem({ name, variant, text, tooltip, options, onSelect }) {
+    const trigger = create("button", `rich-control-trigger rich-control-${variant}`);
+    trigger.type = "button";
+    trigger.setAttribute("aria-label", tooltip);
+    if (variant === "align") {
+      const icon = create("span", "rich-align-icon rich-align-left");
+      icon.setAttribute("aria-hidden", "true");
+      trigger.append(icon, create("span", "sr-only", text), create("span", "rich-control-caret", "⌄"));
+    } else {
+      trigger.append(create("span", "rich-control-value", text), create("span", "rich-control-caret", "⌄"));
+    }
+
+    const body = create("div", `rich-choice-popup-body rich-choice-${variant}`);
     const choices = create("div", "rich-choice-popup-options");
     options.forEach((option) => {
-      const button = create("button", "rich-choice-popup-option", option.label);
+      const button = create("button", `rich-choice-popup-option rich-choice-${variant}-option`);
       button.type = "button";
       button.dataset.value = option.value;
+      button.setAttribute("aria-label", option.label);
+      if (option.icon) {
+        const icon = create("span", `rich-align-icon rich-align-${option.icon}`);
+        icon.setAttribute("aria-hidden", "true");
+        button.append(icon, create("span", "", option.label));
+      } else {
+        const sample = create("span", "rich-choice-sample", option.label);
+        if (variant === "font" && option.preview) sample.dataset.fontPreview = option.preview;
+        if (variant === "size" && option.preview) sample.style.fontSize = `${Math.min(Number(option.preview), 24)}px`;
+        button.append(sample);
+      }
       choices.append(button);
     });
     body.append(choices);
@@ -1169,27 +1190,92 @@
     choices.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-value]");
       if (!button) return;
-      onSelect(button.dataset.value);
+      const value = button.dataset.value;
+      const applied = onSelect(value);
+      if (applied === false) return;
+      choices.querySelectorAll("button").forEach((item) => item.classList.toggle("selected", item === button));
+      if (variant === "align") {
+        const icon = trigger.querySelector(".rich-align-icon");
+        icon.className = `rich-align-icon rich-align-${value}`;
+      } else {
+        const option = options.find((item) => item.value === value);
+        trigger.querySelector(".rich-control-value").textContent = value === "default" ? text : option.label.replace(" px", "");
+      }
     });
 
     return {
       name,
       tooltip,
-      text,
-      className: `toastui-editor-toolbar-icons rich-toolbar-button rich-toolbar-${name}`,
-      style: { backgroundImage: "none" },
+      el: trigger,
       popup: { body, className: "rich-choice-toolbar-popup" },
     };
   }
 
   function applyRichTextCommand(editor, command, payload, onChange) {
-    if (!editor) return;
-    const wasMarkdown = editor.isMarkdownMode();
-    if (wasMarkdown) editor.changeMode("wysiwyg");
-    editor.exec(command, payload);
-    if (wasMarkdown) editor.changeMode("markdown");
-    onChange();
+    if (!editor) return false;
+    let applied = true;
+    if (editor.isMarkdownMode() && command === "brandFont") {
+      applied = applyMarkdownInlineStyle(editor, "font", payload.font);
+    } else if (editor.isMarkdownMode() && command === "brandSize") {
+      applied = applyMarkdownInlineStyle(editor, "size", payload.size);
+    } else {
+      const wasMarkdown = editor.isMarkdownMode();
+      if (wasMarkdown) editor.changeMode("wysiwyg");
+      editor.exec(command, payload);
+      if (wasMarkdown) editor.changeMode("markdown");
+    }
+    if (applied) onChange();
     editor.eventEmitter.emit("closePopup");
+    return applied;
+  }
+
+  // 분할 편집(Markdown)에서는 모드를 바꾸면 선택 범위가 사라지므로,
+  // 선택한 한 줄을 안전한 인라인 HTML로 직접 감싸 오른쪽 미리보기에 즉시 반영합니다.
+  function applyMarkdownInlineStyle(editor, type, rawValue) {
+    const selection = editor.getSelection();
+    if (!Array.isArray(selection?.[0]) || !Array.isArray(selection?.[1])) return false;
+    const [start, end] = selection;
+    if (start[0] !== end[0]) {
+      showToast("폰트와 크기는 한 번에 한 문단 안의 글자를 선택해 적용해 주세요.", true);
+      return false;
+    }
+    const selectedText = editor.getSelectedText(start, end);
+    if (!selectedText) {
+      showToast("먼저 바꿀 글자를 드래그해서 선택해 주세요.", true);
+      return false;
+    }
+
+    const isFont = type === "font";
+    const allowed = isFont ? ["sans", "serif", "mono"] : ["14", "16", "18", "24", "32", "42"];
+    const value = String(rawValue || "default");
+    if (value !== "default" && !allowed.includes(value)) return false;
+    const tag = isFont ? "span" : "big";
+    const attribute = isFont ? "data-brand-font" : "data-brand-size";
+    const lines = editor.getMarkdown().split(/\r?\n/);
+    const line = lines[start[0] - 1] || "";
+    const startOffset = start[1] - 1;
+    const endOffset = end[1] - 1;
+    const prefix = line.slice(0, startOffset);
+    const suffix = line.slice(endOffset);
+    const openPattern = new RegExp(`<${tag}\\b[^>]*${attribute}="[^"]+"[^>]*>$`, "i");
+    const currentOpen = prefix.match(openPattern)?.[0] || "";
+    const closeTag = `</${tag}>`;
+    const hasCurrentWrapper = Boolean(currentOpen && suffix.toLowerCase().startsWith(closeTag));
+
+    if (value === "default" && !hasCurrentWrapper) {
+      showToast(isFont ? "선택한 글자에는 별도 글꼴이 없습니다." : "선택한 글자에는 별도 크기가 없습니다.");
+      return false;
+    }
+
+    const replaceStart = hasCurrentWrapper ? [start[0], start[1] - currentOpen.length] : start;
+    const replaceEnd = hasCurrentWrapper ? [end[0], end[1] + closeTag.length] : end;
+    const openTag = value === "default" ? "" : `<${tag} ${attribute}="${value}">`;
+    const replacement = `${openTag}${selectedText}${value === "default" ? "" : closeTag}`;
+    editor.replaceSelection(replacement, replaceStart, replaceEnd);
+    const selectedStart = [start[0], replaceStart[1] + openTag.length];
+    const selectedEnd = [end[0], selectedStart[1] + selectedText.length];
+    editor.setSelection(selectedStart, selectedEnd);
+    return true;
   }
 
   function richTextExtensionPlugin() {

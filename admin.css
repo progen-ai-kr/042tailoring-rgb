@@ -339,16 +339,92 @@ button { color: inherit; }
 .toast-editor-mount .toastui-editor-contents iframe { aspect-ratio: 16 / 9; }
 .toast-editor-mount .toastui-editor-contents video { height: auto; }
 .toast-editor-fallback { width: 100%; min-height: 760px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; font: 13px/1.7 monospace; resize: vertical; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .toastui-editor-defaultUI-toolbar .detail-video-toolbar-button { width: 46px; background-image: none !important; font-size: 11px !important; font-weight: 800; line-height: 28px; }
 .toastui-editor-defaultUI-toolbar .rich-toolbar-button { width: auto; min-width: 46px; padding: 0 7px; background-image: none !important; font-size: 10px !important; font-weight: 850; line-height: 28px; white-space: nowrap; }
 .toastui-editor-defaultUI-toolbar .gallery-toolbar-button { min-width: 62px; }
 .toastui-editor-popup.detail-video-toolbar-popup { width: min(420px, calc(100% - 20px)); }
-.toastui-editor-popup.rich-choice-toolbar-popup { width: min(340px, calc(100% - 20px)); }
-.rich-choice-popup-body > strong { display: block; color: var(--ink); font-size: 14px; }
-.rich-choice-popup-body > p { margin: 6px 0 13px; color: var(--muted); font-size: 11px; line-height: 1.55; }
-.rich-choice-popup-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.toastui-editor-defaultUI .rich-choice-popup-option { width: 100%; height: 36px; margin: 0; border: 1px solid var(--line-dark); border-radius: 7px; background: var(--surface); color: var(--ink); font-size: 11px; font-weight: 750; cursor: pointer; }
-.toastui-editor-defaultUI .rich-choice-popup-option:hover { border-color: var(--ink); background: var(--ink); color: white; }
+.toast-editor-mount .toolbar-item-wrapper:has(.rich-control-trigger) { height: 30px; margin: 0 1px; }
+.toastui-editor-defaultUI .rich-control-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 30px;
+  margin: 0;
+  padding: 0 8px;
+  border: 1px solid #d5d4ce;
+  border-radius: 5px;
+  background: #fff;
+  color: #252521;
+  font: 700 11px/1 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  letter-spacing: -.02em;
+  cursor: pointer;
+}
+.toastui-editor-defaultUI .rich-control-trigger:hover,
+.toastui-editor-defaultUI .rich-control-trigger:focus-visible { border-color: #76756f; background: #f3f2ed; outline: none; }
+.toastui-editor-defaultUI .rich-control-align { width: 48px; }
+.toastui-editor-defaultUI .rich-control-font { width: 78px; }
+.toastui-editor-defaultUI .rich-control-size { width: 60px; font-variant-numeric: tabular-nums; }
+.rich-control-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rich-control-caret { flex: 0 0 auto; margin-top: -2px; color: #77766f; font-size: 12px; line-height: 1; }
+.rich-align-icon {
+  display: block;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 14px;
+  background:
+    linear-gradient(currentColor 0 0) 0 1px / 100% 2px no-repeat,
+    linear-gradient(currentColor 0 0) 0 6px / 72% 2px no-repeat,
+    linear-gradient(currentColor 0 0) 0 11px / 100% 2px no-repeat;
+}
+.rich-align-center { background-position: center 1px, center 6px, center 11px; }
+.rich-align-right { background-position: right 1px, right 6px, right 11px; }
+.toastui-editor-popup.rich-choice-toolbar-popup { width: auto; min-width: 0; padding: 7px; }
+.rich-choice-popup-body { width: 220px; }
+.rich-choice-popup-options { display: grid; gap: 5px; }
+.toastui-editor-defaultUI .rich-choice-popup-option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+.toastui-editor-defaultUI .rich-choice-popup-option:hover { border-color: var(--line); background: #f3f2ed; color: var(--ink); }
+.toastui-editor-defaultUI .rich-choice-popup-option.selected { border-color: #22221f; background: #22221f; color: #fff; }
+.rich-choice-align { width: 250px; }
+.rich-choice-align .rich-choice-popup-options { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.toastui-editor-defaultUI .rich-choice-align-option { flex-direction: column; justify-content: center; gap: 5px; height: 62px; padding: 5px 3px; font-size: 10px; text-align: center; }
+.rich-choice-font { width: 210px; }
+.toastui-editor-defaultUI .rich-choice-font-option { height: 42px; font-size: 14px; }
+.rich-choice-sample[data-font-preview="sans"] { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+.rich-choice-sample[data-font-preview="serif"] { font-family: Georgia, "Times New Roman", "Noto Serif KR", "Batang", serif; }
+.rich-choice-sample[data-font-preview="mono"] { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+.rich-choice-size { width: 180px; }
+.rich-choice-size .rich-choice-popup-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.toastui-editor-defaultUI .rich-choice-size-option { justify-content: center; height: 43px; padding: 0 4px; font-variant-numeric: tabular-nums; text-align: center; }
 .detail-video-popup-body > strong { display: block; color: var(--ink); font-size: 14px; }
 .detail-video-popup-body > p { margin: 6px 0 14px; color: var(--muted); font-size: 11px; line-height: 1.55; }
 .detail-video-popup-form input {
