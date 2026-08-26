@@ -29,32 +29,12 @@
     <p>브랜드의 작업·프로젝트 사례를 소개합니다.</p>
   </section>
 
-  <!-- ===== 사례 하나 = .case 블록 하나 [작성서 06: 사례①②③] =====
-       사례가 더 있으면 블록을 복사하세요. 사진은 grid로 함께. -->
   <section class="section">
-
-    <div class="case">
-      <p class="k">CASE 01</p>
-      <h3>사례 제목</h3>
-      <p>사례 설명을 여기에 붙여넣으세요.</p>
-      <div class="grid" style="margin-top:14px;">
-        <div class="card"><div class="card-img"></div></div>
-        <div class="card"><div class="card-img"></div></div>
-      </div>
-    </div>
-
-    <div class="case">
-      <p class="k">CASE 02</p>
-      <h3>사례 제목</h3>
-      <p>사례 설명을 여기에 붙여넣으세요.</p>
-    </div>
-
-    <div class="case">
-      <p class="k">CASE 03</p>
-      <h3>사례 제목</h3>
-      <p>사례 설명을 여기에 붙여넣으세요.</p>
-    </div>
-
+    <!-- 브랜드 담당자가 관리자에서 작성한 한 개의 포트폴리오 문서가 여기에 표시됩니다.
+         학생은 이 컨테이너와 portfolio.js를 유지하고 CSS로 UI만 디자인하세요. -->
+    <article id="portfolioContent" class="portfolio-content" aria-live="polite">
+      <p class="portfolio-status">포트폴리오를 불러오는 중입니다.</p>
+    </article>
   </section>
 
   <footer class="footer">
@@ -66,6 +46,8 @@
     <p>© 브랜드 이름. All rights reserved.</p>
   </footer>
 
+  <script src="catalog.js"></script>
+  <script src="portfolio.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

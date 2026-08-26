@@ -5,7 +5,7 @@
   const brandName = String(window.BRAND_SITE && window.BRAND_SITE.name || "브랜드").trim() || "브랜드";
   const siteChoices = normalizeSiteChoices(window.BRAND_SITE);
   const publicSiteUrl = siteChoices[0]?.url || "";
-  document.title = `${brandName} 제품 관리`;
+  document.title = `${brandName} 관리`;
   document.querySelectorAll("[data-brand-name]").forEach((element) => {
     element.textContent = brandName;
   });
@@ -22,14 +22,21 @@
   const state = {
     catalog: null,
     sha: "",
+    portfolio: { body: "" },
+    portfolioSha: "",
     currentId: "",
     dirty: false,
+    portfolioDirty: false,
+    activeSection: "products",
     uploading: 0,
   };
   let toastTimer;
   let detailPreviewMedia;
   let detailPreviewMediaHandler;
   let detailImageCandidate;
+  let portfolioPreviewMedia;
+  let portfolioPreviewMediaHandler;
+  let portfolioImageCandidate;
   let imageEditorInstance;
   let imageEditTarget;
   let imageEditorResizeTimer;
@@ -48,6 +55,9 @@
     logout: $("#logoutButton"),
     siteView: $("#siteViewLink"),
     saveState: $("#saveState"),
+    adminTabs: [...document.querySelectorAll("[data-admin-tab]")],
+    productAdminView: $("#productAdminView"),
+    portfolioAdminView: $("#portfolioAdminView"),
     sidebar: $("#productSidebar"),
     productCount: $("#productCount"),
     productSearch: $("#productSearch"),
@@ -69,6 +79,12 @@
     detailEditorMount: $("#detailEditorMount"),
     detailImageEdit: $("#detailImageEditButton"),
     deleteProduct: $("#deleteProductButton"),
+    portfolioForm: $("#portfolioForm"),
+    portfolioPreview: $("#portfolioPreviewLink"),
+    portfolioSave: $("#portfolioSaveButton"),
+    portfolioEditorShell: $("#portfolioEditorShell"),
+    portfolioEditorMount: $("#portfolioEditorMount"),
+    portfolioImageEdit: $("#portfolioImageEditButton"),
     passwordDialog: $("#passwordDialog"),
     passwordForm: $("#passwordForm"),
     passwordDialogTitle: $("#passwordDialogTitle"),
@@ -116,12 +132,19 @@
       elements.passwordToggle.textContent = visible ? "보기" : "숨김";
     });
     elements.changePassword.addEventListener("click", openPasswordDialog);
+    elements.adminTabs.forEach((button) => button.addEventListener("click", () => switchAdminSection(button.dataset.adminTab)));
     elements.passwordForm.addEventListener("submit", handlePasswordChange);
     elements.passwordCancel.addEventListener("click", closePasswordDialog);
-    elements.siteView.addEventListener("click", (event) => handleSiteChoice(event, "products.html", "사이트를 확인할 팀 선택"));
+    elements.siteView.addEventListener("click", (event) => {
+      const portfolio = state.activeSection === "portfolio";
+      handleSiteChoice(event, portfolio ? "portfolio.html" : "products.html", "사이트를 확인할 팀 선택");
+    });
     elements.preview.addEventListener("click", (event) => {
       const product = currentProduct();
       if (product) handleSiteChoice(event, `product.html?id=${encodeURIComponent(product.id)}`, "공개 페이지를 확인할 팀 선택");
+    });
+    elements.portfolioPreview.addEventListener("click", (event) => {
+      handleSiteChoice(event, "portfolio.html", "공개 페이지를 확인할 팀 선택");
     });
     elements.siteChoiceClose.addEventListener("click", () => elements.siteChoiceDialog.close());
     elements.siteChoiceDialog.addEventListener("click", (event) => {
@@ -133,6 +156,7 @@
     elements.mobileList.addEventListener("click", () => document.body.classList.remove("editor-open"));
     elements.sidebarToggle.addEventListener("click", toggleProductSidebar);
     elements.productForm.addEventListener("submit", saveCatalog);
+    elements.portfolioForm.addEventListener("submit", savePortfolio);
     elements.productForm.addEventListener("input", handleProductField);
     elements.productForm.addEventListener("change", handleProductField);
     elements.deleteProduct.addEventListener("click", deleteCurrentProduct);
@@ -149,6 +173,12 @@
     elements.detailEditorMount.addEventListener("scroll", hideDetailImageEditButton, true);
     elements.detailImageEdit.addEventListener("click", () => {
       if (detailImageCandidate) openImageEditor(detailImageCandidate);
+    });
+    elements.portfolioEditorMount.addEventListener("mouseover", handlePortfolioImageHover, true);
+    elements.portfolioEditorMount.addEventListener("click", handlePortfolioImageHover, true);
+    elements.portfolioEditorMount.addEventListener("scroll", hidePortfolioImageEditButton, true);
+    elements.portfolioImageEdit.addEventListener("click", () => {
+      if (portfolioImageCandidate) openImageEditor(portfolioImageCandidate);
     });
     elements.imageEditorClose.addEventListener("click", closeImageEditor);
     elements.imageEditorCancel.addEventListener("click", closeImageEditor);
@@ -172,7 +202,7 @@
       await addMainImages(event.dataTransfer.files);
     });
     window.addEventListener("beforeunload", (event) => {
-      if (!state.dirty) return;
+      if (!hasUnsavedChanges()) return;
       event.preventDefault();
       event.returnValue = "";
     });
@@ -276,13 +306,18 @@
   }
 
   async function handleLogout() {
-    if (state.dirty && !window.confirm("저장하지 않은 변경사항이 있습니다. 그래도 로그아웃할까요?")) return;
+    if (hasUnsavedChanges() && !window.confirm("저장하지 않은 변경사항이 있습니다. 그래도 로그아웃할까요?")) return;
     try { await api("/api/admin/logout", { method: "POST", body: "{}" }); } catch (_) {}
     state.catalog = null;
     state.sha = "";
+    state.portfolio = { body: "" };
+    state.portfolioSha = "";
     state.currentId = "";
+    destroyToastEditor("detail");
+    destroyToastEditor("portfolio");
     if (elements.passwordDialog.open) elements.passwordDialog.close();
     setDirty(false);
+    setPortfolioDirty(false);
     showLogin();
   }
 
@@ -303,13 +338,21 @@
     elements.login.hidden = true;
     elements.app.hidden = true;
     try {
-      const data = await api("/api/admin/catalog");
-      state.catalog = data.catalog;
-      state.sha = data.sha;
+      const [catalogData, portfolioData] = await Promise.all([
+        api("/api/admin/catalog"),
+        api("/api/admin/portfolio"),
+      ]);
+      state.catalog = catalogData.catalog;
+      state.sha = catalogData.sha;
+      state.portfolio = portfolioData.portfolio || { body: "" };
+      state.portfolioSha = portfolioData.sha;
       state.currentId = state.catalog.products[0]?.id || "";
       setDirty(false);
+      setPortfolioDirty(false);
       renderProductList();
       renderEditor();
+      renderPortfolioEditor();
+      switchAdminSection(state.activeSection, false);
       elements.loading.hidden = true;
       elements.app.hidden = false;
     } catch (error) {
@@ -317,6 +360,28 @@
       if (error.status === 401) showLogin();
       else showLogin(error.message);
     }
+  }
+
+  function switchAdminSection(section, scroll = true) {
+    const next = section === "portfolio" ? "portfolio" : "products";
+    state.activeSection = next;
+    const portfolio = next === "portfolio";
+    elements.productAdminView.hidden = portfolio;
+    elements.portfolioAdminView.hidden = !portfolio;
+    elements.adminTabs.forEach((button) => {
+      const active = button.dataset.adminTab === next;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    elements.siteView.href = sitePageUrl(portfolio ? "portfolio.html" : "products.html");
+    elements.siteView.textContent = portfolio ? "포트폴리오 보기 ↗" : "사이트 보기 ↗";
+    document.body.classList.toggle("portfolio-admin-open", portfolio);
+    updateSaveState();
+    if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function hasUnsavedChanges() {
+    return state.dirty || state.portfolioDirty;
   }
 
   function currentProduct() {
@@ -533,6 +598,34 @@
     elements.detailImageEdit.hidden = true;
   }
 
+  function handlePortfolioImageHover(event) {
+    const image = event.target.closest?.(".toastui-editor-contents img");
+    if (!image || !elements.portfolioEditorMount.contains(image)) return;
+    const content = image.closest(".toastui-editor-contents");
+    const index = [...content.querySelectorAll("img")].indexOf(image);
+    const source = image.getAttribute("src") || image.currentSrc || image.src;
+    if (index < 0 || !source) return;
+
+    portfolioImageCandidate = {
+      kind: "portfolio",
+      productId: "portfolio",
+      index,
+      source,
+      name: image.alt || "포트폴리오 이미지",
+    };
+
+    const shellRect = elements.portfolioEditorShell.getBoundingClientRect();
+    const imageRect = image.getBoundingClientRect();
+    elements.portfolioImageEdit.hidden = false;
+    elements.portfolioImageEdit.style.top = `${Math.max(8, imageRect.top - shellRect.top + 10)}px`;
+    elements.portfolioImageEdit.style.left = `${Math.min(shellRect.width - 8, imageRect.right - shellRect.left - 10)}px`;
+  }
+
+  function hidePortfolioImageEditButton() {
+    portfolioImageCandidate = null;
+    elements.portfolioImageEdit.hidden = true;
+  }
+
   async function openImageEditor(target) {
     if (!window.tui?.ImageEditor) {
       showToast("이미지 편집기를 불러오지 못했습니다. 페이지를 새로고침해 주세요.", true);
@@ -543,7 +636,10 @@
     destroyImageEditorInstance();
     imageEditTarget = target;
     hideDetailImageEditButton();
-    elements.imageEditorTitle.textContent = target.kind === "main" ? "대표·갤러리 이미지 수정" : "상세페이지 이미지 수정";
+    hidePortfolioImageEditButton();
+    elements.imageEditorTitle.textContent = target.kind === "main"
+      ? "대표·갤러리 이미지 수정"
+      : target.kind === "portfolio" ? "포트폴리오 이미지 수정" : "상세페이지 이미지 수정";
     elements.imageEditorLead.textContent = "자르기·크기·회전·필터·텍스트 도구를 사용한 뒤 ‘수정 적용’을 누르세요.";
     elements.imageEditorApply.disabled = true;
     elements.imageEditorApply.textContent = "이미지 준비 중…";
@@ -621,8 +717,10 @@
     const instance = imageEditorInstance;
     const target = imageEditTarget;
     if (!instance || !target) return;
-    const product = state.catalog?.products?.find((item) => item.id === target.productId);
-    if (!product) {
+    const product = target.kind === "portfolio"
+      ? null
+      : state.catalog?.products?.find((item) => item.id === target.productId);
+    if (target.kind !== "portfolio" && !product) {
       showToast("수정할 제품을 찾지 못했습니다.", true);
       return;
     }
@@ -635,7 +733,11 @@
       elements.imageEditorApply.textContent = "이미지 올리는 중…";
       const dataUrl = instance.toDataURL({ format: "png" });
       const file = await dataUrlToFile(dataUrl, `edited-${Date.now()}.png`);
-      const paths = await uploadFiles([file], product.id);
+      const paths = await uploadFiles(
+        [file],
+        target.kind === "portfolio" ? "portfolio" : product.id,
+        target.kind === "portfolio" ? "portfolio" : "product"
+      );
       const path = paths[0];
       if (!path) return;
 
@@ -644,11 +746,14 @@
         product.images[target.index] = path;
         renderMainImages();
         renderProductList();
-      } else {
+      } else if (target.kind === "detail") {
         replaceDetailImage(target, path, product);
+      } else {
+        replacePortfolioImage(target, path);
       }
 
-      setDirty(true);
+      if (target.kind === "portfolio") setPortfolioDirty(true);
+      else setDirty(true);
       delete elements.imageEditorDialog.dataset.saving;
       closeImageEditor();
       showToast("수정한 이미지를 반영했습니다. 마지막으로 변경사항을 저장해 주세요.");
@@ -698,6 +803,24 @@
     editor.setHTML(html, false);
     product.sections = singleDetailSection(editor.getHTML());
     hideDetailImageEditButton();
+  }
+
+  function replacePortfolioImage(target, path) {
+    const editor = toastEditors.get("portfolio");
+    if (!editor) throw new Error("포트폴리오 편집기를 찾지 못했습니다.");
+    const documentBody = new DOMParser().parseFromString(editor.getHTML(), "text/html").body;
+    const images = [...documentBody.querySelectorAll("img")];
+    let image = images[target.index];
+    if (!image || !sameImageSource(image.getAttribute("src"), target.source)) {
+      image = images.find((candidate) => sameImageSource(candidate.getAttribute("src"), target.source));
+    }
+    if (!image) throw new Error("수정할 포트폴리오 이미지를 찾지 못했습니다.");
+    image.setAttribute("src", imageUrl(path));
+    if (target.name) image.setAttribute("alt", target.name);
+    const html = sanitizeEditorHtml(documentBody.innerHTML);
+    editor.setHTML(html, false);
+    state.portfolio.body = sanitizeEditorHtml(editor.getHTML());
+    hidePortfolioImageEditButton();
   }
 
   function sameImageSource(left, right) {
@@ -763,7 +886,7 @@
   function renderDetailEditor() {
     const product = currentProduct();
     hideDetailImageEditButton();
-    destroyToastEditors();
+    destroyToastEditor("detail");
     elements.detailEditorMount.replaceChildren();
     if (!product) return;
 
@@ -804,7 +927,10 @@
         ["hr", "quote"],
         ["ul", "ol"],
         ["image", "link"],
-        [createVideoToolbarItem(() => editor, product)],
+        [createVideoToolbarItem(() => editor, () => {
+          product.sections = singleDetailSection(editor.getHTML());
+          setDirty(true);
+        }, "상세페이지")],
       ],
       customHTMLRenderer: videoHtmlRenderer(),
       hooks: {
@@ -828,6 +954,77 @@
     detailPreviewMediaHandler = () => editor.changePreviewStyle(previewMedia.matches ? "vertical" : "tab");
     if (previewMedia.addEventListener) previewMedia.addEventListener("change", detailPreviewMediaHandler);
     else previewMedia.addListener(detailPreviewMediaHandler);
+  }
+
+  function renderPortfolioEditor() {
+    hidePortfolioImageEditButton();
+    destroyToastEditor("portfolio");
+    elements.portfolioEditorMount.replaceChildren();
+    const initialHtml = sanitizeEditorHtml(state.portfolio?.body || "");
+
+    if (!window.toastui?.Editor) {
+      const fallback = document.createElement("textarea");
+      fallback.className = "toast-editor-fallback";
+      fallback.value = initialHtml;
+      fallback.placeholder = "브랜드의 작업과 이야기를 한 페이지로 작성해 주세요.";
+      fallback.addEventListener("input", () => {
+        state.portfolio.body = sanitizeEditorHtml(fallback.value);
+        setPortfolioDirty(true);
+      });
+      elements.portfolioEditorMount.append(fallback);
+      return;
+    }
+
+    let ready = false;
+    let editor;
+    const previewMedia = window.matchMedia("(min-width: 1100px)");
+    window.toastui.Editor.setLanguage(["ko", "ko-KR"], {
+      Markdown: "분할 편집",
+      WYSIWYG: "블로그 편집",
+    });
+    editor = new window.toastui.Editor({
+      el: elements.portfolioEditorMount,
+      height: "820px",
+      minHeight: "580px",
+      initialEditType: "wysiwyg",
+      previewStyle: previewMedia.matches ? "vertical" : "tab",
+      hideModeSwitch: false,
+      language: "ko-KR",
+      autofocus: false,
+      usageStatistics: false,
+      placeholder: "브랜드의 작업과 이야기를 한 페이지로 작성해 주세요.",
+      toolbarItems: [
+        ["heading", "bold", "italic", "strike"],
+        ["hr", "quote"],
+        ["ul", "ol"],
+        ["image", "link"],
+        [createVideoToolbarItem(() => editor, () => {
+          state.portfolio.body = sanitizeEditorHtml(editor.getHTML());
+          setPortfolioDirty(true);
+        }, "포트폴리오")],
+      ],
+      customHTMLRenderer: videoHtmlRenderer(),
+      hooks: {
+        addImageBlobHook: async (blob, callback) => {
+          const paths = await uploadFiles([blob], "portfolio", "portfolio");
+          if (paths[0]) callback(imageUrl(paths[0]), blob.name || "포트폴리오 이미지");
+        },
+      },
+      events: {
+        change: () => {
+          if (!ready) return;
+          state.portfolio.body = sanitizeEditorHtml(editor.getHTML());
+          setPortfolioDirty(true);
+        },
+      },
+    });
+    editor.setHTML(initialHtml, false);
+    ready = true;
+    toastEditors.set("portfolio", editor);
+    portfolioPreviewMedia = previewMedia;
+    portfolioPreviewMediaHandler = () => editor.changePreviewStyle(previewMedia.matches ? "vertical" : "tab");
+    if (previewMedia.addEventListener) previewMedia.addEventListener("change", portfolioPreviewMediaHandler);
+    else previewMedia.addListener(portfolioPreviewMediaHandler);
   }
 
   function sectionsToSingleHtml(sections) {
@@ -865,17 +1062,24 @@
     return body.trim() ? [{ type: "rich_text", body }] : [];
   }
 
-  function destroyToastEditors() {
-    if (detailPreviewMedia && detailPreviewMediaHandler) {
+  function destroyToastEditor(key) {
+    if (key === "detail" && detailPreviewMedia && detailPreviewMediaHandler) {
       if (detailPreviewMedia.removeEventListener) detailPreviewMedia.removeEventListener("change", detailPreviewMediaHandler);
       else detailPreviewMedia.removeListener(detailPreviewMediaHandler);
+      detailPreviewMedia = null;
+      detailPreviewMediaHandler = null;
     }
-    detailPreviewMedia = null;
-    detailPreviewMediaHandler = null;
-    toastEditors.forEach((editor) => {
+    if (key === "portfolio" && portfolioPreviewMedia && portfolioPreviewMediaHandler) {
+      if (portfolioPreviewMedia.removeEventListener) portfolioPreviewMedia.removeEventListener("change", portfolioPreviewMediaHandler);
+      else portfolioPreviewMedia.removeListener(portfolioPreviewMediaHandler);
+      portfolioPreviewMedia = null;
+      portfolioPreviewMediaHandler = null;
+    }
+    const editor = toastEditors.get(key);
+    if (editor) {
       try { editor.destroy(); } catch (_) {}
-    });
-    toastEditors.clear();
+      toastEditors.delete(key);
+    }
   }
 
   function syncToastEditors() {
@@ -885,7 +1089,12 @@
     if (editor) product.sections = singleDetailSection(editor.getHTML());
   }
 
-  function createVideoToolbarItem(getEditor, product) {
+  function syncPortfolioEditor() {
+    const editor = toastEditors.get("portfolio");
+    if (editor) state.portfolio.body = sanitizeEditorHtml(editor.getHTML());
+  }
+
+  function createVideoToolbarItem(getEditor, onInsert, contextLabel) {
     const body = create("div", "detail-video-popup-body");
     body.append(create("strong", "", "영상 주소로 추가"));
     body.append(create("p", "", "유튜브·비메오 또는 MP4·WebM·Ogg 영상 파일 주소를 붙여 넣으세요."));
@@ -928,10 +1137,9 @@
 
       if (editor.isMarkdownMode()) editor.insertText(`\n\n${markup}\n\n`);
       else editor.setHTML(`${editor.getHTML()}${markup}`, true);
-      product.sections = singleDetailSection(editor.getHTML());
-      setDirty(true);
+      onInsert();
       closePopup();
-      showToast("영상을 상세페이지에 추가했습니다. 저장하면 사이트에 반영됩니다.");
+      showToast(`영상을 ${contextLabel}에 추가했습니다. 저장하면 사이트에 반영됩니다.`);
     });
 
     return {
@@ -947,13 +1155,14 @@
     };
   }
 
-  async function uploadFiles(fileList, productId) {
+  async function uploadFiles(fileList, productId, scope = "product") {
     const files = [...fileList].slice(0, 30);
     const paths = [];
     if (!files.length) return paths;
     state.uploading += files.length;
     updateSaveState();
     elements.save.disabled = true;
+    elements.portfolioSave.disabled = true;
 
     for (let index = 0; index < files.length; index += 1) {
       const file = files[index];
@@ -965,6 +1174,7 @@
           headers: {
             "Content-Type": prepared.type,
             "X-Product-Id": productId,
+            "X-Upload-Scope": scope,
           },
           body: prepared,
         });
@@ -977,6 +1187,7 @@
       }
     }
     elements.save.disabled = false;
+    elements.portfolioSave.disabled = false;
     if (paths.length) showToast(`${paths.length}장의 이미지를 추가했습니다. 마지막으로 변경사항을 저장해 주세요.`);
     return paths;
   }
@@ -1045,6 +1256,37 @@
     }
   }
 
+  async function savePortfolio(event) {
+    event.preventDefault();
+    syncPortfolioEditor();
+    if (!state.portfolioDirty) {
+      showToast("이미 저장된 상태입니다.");
+      return;
+    }
+    if (state.uploading) {
+      showToast("이미지 업로드가 끝날 때까지 기다려 주세요.", true);
+      return;
+    }
+
+    elements.portfolioSave.disabled = true;
+    elements.portfolioSave.textContent = "저장 중…";
+    try {
+      const result = await api("/api/admin/portfolio", {
+        method: "PUT",
+        body: JSON.stringify({ portfolio: state.portfolio, expectedSha: state.portfolioSha }),
+      });
+      state.portfolioSha = result.sha;
+      setPortfolioDirty(false);
+      showToast("포트폴리오를 저장했습니다. 보통 1~2분 뒤 두 팀 사이트에 함께 반영됩니다.");
+    } catch (error) {
+      showToast(error.message, true);
+      if (error.status === 409 && window.confirm("최신 내용을 다시 불러올까요? 현재 저장하지 않은 변경사항은 사라집니다.")) await openAdmin();
+    } finally {
+      elements.portfolioSave.disabled = false;
+      elements.portfolioSave.textContent = "변경사항 저장";
+    }
+  }
+
   function deleteCurrentProduct() {
     const product = currentProduct();
     if (!product) return;
@@ -1063,11 +1305,20 @@
     updateSaveState();
   }
 
+  function setPortfolioDirty(value) {
+    state.portfolioDirty = value;
+    updateSaveState();
+  }
+
   function updateSaveState() {
+    elements.adminTabs.forEach((button) => {
+      const dirty = button.dataset.adminTab === "products" ? state.dirty : state.portfolioDirty;
+      button.classList.toggle("has-changes", dirty);
+    });
     if (state.uploading) {
       elements.saveState.textContent = `이미지 업로드 중 ${state.uploading}`;
       elements.saveState.classList.add("dirty");
-    } else if (state.dirty) {
+    } else if (state.activeSection === "products" ? state.dirty : state.portfolioDirty) {
       elements.saveState.textContent = "저장하지 않은 변경사항";
       elements.saveState.classList.add("dirty");
     } else {
@@ -1187,14 +1438,14 @@
       }
       if (/^[A-Za-z0-9_-]{6,20}$/.test(youtubeId)) {
         const source = `https://www.youtube-nocookie.com/embed/${youtubeId}`;
-        return `<iframe src="${source}" title="제품 영상" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+        return `<iframe src="${source}" title="브랜드 영상" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
       }
 
       if (["vimeo.com", "www.vimeo.com", "player.vimeo.com"].includes(host)) {
         const vimeoId = url.pathname.match(/(?:video\/)?(\d+)/)?.[1] || "";
         if (vimeoId) {
           const source = `https://player.vimeo.com/video/${vimeoId}`;
-          return `<iframe src="${source}" title="제품 영상" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+          return `<iframe src="${source}" title="브랜드 영상" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
         }
       }
     } catch (_) {}
@@ -1216,7 +1467,7 @@
               outerNewLine: true,
               attributes: {
                 src: source,
-                title: "제품 영상",
+                title: "브랜드 영상",
                 loading: "lazy",
                 allow: source.includes("vimeo.com") ? "autoplay; fullscreen; picture-in-picture" : "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
                 allowfullscreen: "true",
@@ -1276,7 +1527,7 @@
             return;
           }
           node.setAttribute("src", safeSource);
-          node.setAttribute("title", "제품 영상");
+          node.setAttribute("title", "브랜드 영상");
           node.setAttribute("loading", "lazy");
           node.setAttribute("allow", safeSource.includes("vimeo.com") ? "autoplay; fullscreen; picture-in-picture" : "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
           node.setAttribute("allowfullscreen", "");

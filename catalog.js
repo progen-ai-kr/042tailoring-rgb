@@ -110,7 +110,7 @@
             return;
           }
           node.setAttribute("src", source);
-          node.setAttribute("title", "제품 영상");
+          node.setAttribute("title", "브랜드 영상");
           node.setAttribute("loading", "lazy");
           node.setAttribute("allow", source.includes("vimeo.com") ? "autoplay; fullscreen; picture-in-picture" : "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
           node.setAttribute("allowfullscreen", "");

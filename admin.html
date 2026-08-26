@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>브랜드 제품 관리</title>
+  <title>브랜드 관리</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="vendor/toastui/toastui-editor.min.css" />
   <link rel="stylesheet" href="vendor/tui-image-editor/tui-color-picker.min.css?v=20260825" />
   <link rel="stylesheet" href="vendor/tui-image-editor/tui-image-editor.min.css?v=20260825" />
-  <link rel="stylesheet" href="admin.css?v=20260825-image-editor" />
+  <link rel="stylesheet" href="admin.css?v=20260826-portfolio-1" />
 </head>
 <body>
   <div id="loadingView" class="center-view">
@@ -20,7 +20,7 @@
     <section class="login-card">
       <p class="login-brand" data-brand-name>브랜드</p>
       <p class="eyebrow">BRAND ADMIN</p>
-      <h1>제품 관리</h1>
+      <h1>브랜드 관리</h1>
       <p class="login-lead">브랜드 담당자에게 전달받은 관리자 비밀번호를 입력하세요.</p>
 
       <form id="loginForm" class="login-form">
@@ -38,9 +38,12 @@
 
   <div id="adminApp" class="admin-app" hidden>
     <header class="admin-header">
-      <div>
+      <div class="admin-identity">
         <span class="admin-brand" data-brand-name>브랜드</span>
-        <span class="admin-title">제품 관리</span>
+        <nav class="admin-tabs" aria-label="관리 메뉴">
+          <button class="admin-tab active" type="button" data-admin-tab="products" aria-selected="true">제품 관리</button>
+          <button class="admin-tab" type="button" data-admin-tab="portfolio" aria-selected="false">포트폴리오</button>
+        </nav>
       </div>
       <div class="header-actions">
         <span id="saveState" class="save-state">저장됨</span>
@@ -50,7 +53,7 @@
       </div>
     </header>
 
-    <div class="admin-layout">
+    <div id="productAdminView" class="admin-layout">
       <aside id="productSidebar" class="product-sidebar">
         <div class="sidebar-heading">
           <div>
@@ -199,6 +202,34 @@
         </form>
       </main>
     </div>
+
+    <main id="portfolioAdminView" class="portfolio-admin-view" hidden>
+      <form id="portfolioForm" class="portfolio-form">
+        <div class="editor-toolbar portfolio-toolbar">
+          <div class="editor-heading">
+            <p class="eyebrow">EDIT PORTFOLIO</p>
+            <h1>포트폴리오 페이지 편집</h1>
+          </div>
+          <div class="editor-actions">
+            <a id="portfolioPreviewLink" class="ghost-button" href="portfolio.html" target="_blank" rel="noopener">공개 페이지 ↗</a>
+            <button id="portfolioSaveButton" class="primary-button" type="submit">변경사항 저장</button>
+          </div>
+        </div>
+        <div class="editor-content portfolio-editor-content">
+          <section class="panel portfolio-editor-panel">
+            <div class="panel-heading">
+              <div><span class="step-number">01</span><h2>포트폴리오 구성</h2></div>
+              <p>한 편의 블로그 글처럼 글·이미지·링크·영상을 원하는 순서로 작성하세요.</p>
+            </div>
+            <p class="helper detail-helper">‘블로그 편집’에서는 실제 페이지처럼 바로 작성할 수 있고, ‘분할 편집’에서는 작성 화면과 미리보기를 좌우로 함께 볼 수 있습니다.</p>
+            <div id="portfolioEditorShell" class="detail-editor-shell portfolio-editor-shell">
+              <div id="portfolioEditorMount" class="toast-editor-mount portfolio-editor-mount"></div>
+              <button id="portfolioImageEditButton" class="detail-image-edit-button" type="button" hidden>이미지 수정</button>
+            </div>
+          </section>
+        </div>
+      </form>
+    </main>
   </div>
 
   <dialog id="passwordDialog" class="password-dialog">
@@ -274,6 +305,6 @@
   <script src="vendor/toastui/ko-kr.js"></script>
   <script src="vendor/tui-image-editor/tui-color-picker.min.js?v=20260825"></script>
   <script src="vendor/tui-image-editor/tui-image-editor.min.js?v=20260825"></script>
-  <script src="admin.js?v=20260825-image-editor-3" defer></script>
+  <script src="admin.js?v=20260826-portfolio-1" defer></script>
 </body>
 </html>

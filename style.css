@@ -148,7 +148,36 @@ a { color: inherit; }
 .product-highlight > :last-child { margin-bottom: 0; }
 .product-back { text-align: center; padding-top: 0; }
 
-/* ===== 포트폴리오 사례 ===== */
+/* ===== 포트폴리오 =====
+   관리자 편집기에서 만든 한 페이지가 이 영역에 표시됩니다.
+   학생은 아래 스타일을 브랜드 디자인에 맞게 자유롭게 바꿀 수 있습니다. */
+.portfolio-content { max-width: 860px; margin: 0 auto; overflow-wrap: anywhere; }
+.portfolio-content > :first-child { margin-top: 0; }
+.portfolio-content > :last-child { margin-bottom: 0; }
+.portfolio-content h2 { margin: 48px 0 18px; font-family: var(--font-display); font-size: clamp(25px, 6vw, 42px); line-height: 1.25; }
+.portfolio-content h3 { margin: 36px 0 13px; font-size: clamp(19px, 4.5vw, 27px); line-height: 1.35; }
+.portfolio-content h4 { margin: 30px 0 10px; font-size: 18px; }
+.portfolio-content p { margin: 0 0 20px; color: var(--ink-soft); }
+.portfolio-content strong { color: var(--ink); }
+.portfolio-content ul,
+.portfolio-content ol { margin: 0 0 24px 24px; color: var(--ink-soft); }
+.portfolio-content li + li { margin-top: 7px; }
+.portfolio-content blockquote { margin: 34px 0; padding: 6px 0 6px 20px; border-left: 3px solid var(--accent); font-size: clamp(18px, 4vw, 24px); }
+.portfolio-content blockquote p { color: var(--ink); }
+.portfolio-content a { text-underline-offset: 3px; }
+.portfolio-content hr { margin: 52px 0; border: 0; border-top: 1px solid var(--line); }
+.portfolio-content img { width: 100%; height: auto; margin: 30px 0; border-radius: var(--radius); }
+.portfolio-content figure { margin: 34px 0; }
+.portfolio-content figure img { margin: 0; }
+.portfolio-content figcaption { margin-top: 9px; color: var(--ink-soft); font-size: 12px; text-align: center; }
+.portfolio-content iframe,
+.portfolio-content video { display: block; width: 100%; margin: 36px 0; border: 0; border-radius: var(--radius); background: #111; }
+.portfolio-content iframe { aspect-ratio: 16 / 9; }
+.portfolio-content video { height: auto; }
+.portfolio-content.is-empty { min-height: 220px; display: grid; place-items: center; text-align: center; }
+.portfolio-status { color: var(--ink-soft); font-size: 14px; }
+
+/* 기존 사례형 UI를 사용하고 싶은 학생 팀을 위한 선택 스타일 */
 .case { border-top: 1px solid var(--line); padding: 28px 0; }
 .case .k { font-size: 12px; letter-spacing: 2px; color: var(--ink-soft); }
 .case h3 { margin: 6px 0 8px; }

@@ -3,6 +3,7 @@ const SESSION_COOKIE = "brand_admin_session";
 const SESSION_SECONDS = 60 * 60 * 24 * 30;
 const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
 const MAX_CATALOG_BYTES = 900 * 1024;
+const MAX_PORTFOLIO_BYTES = 900 * 1024;
 const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 const LOGIN_MAX_ATTEMPTS = 8;
 const loginAttempts = new Map();
@@ -16,7 +17,7 @@ export default {
       return standaloneAdminAsset(request, env, url);
     }
 
-    if (url.pathname.startsWith("/images/products/")) {
+    if (url.pathname.startsWith("/images/products/") || url.pathname.startsWith("/images/portfolio/")) {
       return repositoryImageAsset(request, env, url, () => env.ASSETS.fetch(request));
     }
 
@@ -206,6 +207,66 @@ async function handleAdminApi(request, env, url) {
     });
   }
 
+  if (path === "/api/admin/portfolio" && request.method === "GET") {
+    const file = await readGitHubFile(env, "portfolio.json", primaryRepository(env));
+    let portfolio;
+    try {
+      portfolio = normalizePortfolio(JSON.parse(file.text));
+    } catch (_) {
+      return json({ error: "포트폴리오 데이터 형식이 올바르지 않습니다." }, 502);
+    }
+    return json({ portfolio, sha: file.sha });
+  }
+
+  if (path === "/api/admin/portfolio" && request.method === "PUT") {
+    const body = await readJson(request);
+    const normalized = normalizePortfolio(body.portfolio);
+    const repositories = githubRepositories(env);
+    const currentFiles = await Promise.all(
+      repositories.map(async (repository) => ({
+        repository,
+        file: await readGitHubFile(env, "portfolio.json", repository),
+      }))
+    );
+    const current = currentFiles[0].file;
+
+    if (!body.expectedSha || body.expectedSha !== current.sha) {
+      return json({ error: "다른 곳에서 먼저 수정되었습니다. 새로고침한 뒤 다시 저장해 주세요." }, 409);
+    }
+
+    const content = `${JSON.stringify(normalized, null, 2)}\n`;
+    if (new TextEncoder().encode(content).byteLength > MAX_PORTFOLIO_BYTES) {
+      return json({ error: "포트폴리오 내용이 너무 큽니다. 글이나 이미지를 줄여 주세요." }, 413);
+    }
+
+    const replicaResults = [];
+    for (const target of currentFiles.slice(1)) {
+      replicaResults.push(await writeGitHubFile(
+        env,
+        "portfolio.json",
+        content,
+        target.file.sha,
+        "브랜드 포트폴리오 동기화",
+        target.repository
+      ));
+    }
+    const result = await writeGitHubFile(
+      env,
+      "portfolio.json",
+      content,
+      current.sha,
+      "브랜드 포트폴리오 수정",
+      currentFiles[0].repository
+    );
+    return json({
+      ok: true,
+      sha: result.content.sha,
+      commitUrl: result.commit.html_url,
+      repositories,
+      replicaCommits: replicaResults.map((item) => item.commit.html_url),
+    });
+  }
+
   if (path === "/api/admin/image" && request.method === "POST") {
     return uploadImage(request, env);
   }
@@ -300,17 +361,32 @@ async function uploadImage(request, env) {
     return json({ error: "이미지는 한 장당 6MB 이하여야 합니다." }, 413);
   }
 
+  const uploadScope = request.headers.get("X-Upload-Scope") === "portfolio" ? "portfolio" : "product";
   const productId = (request.headers.get("X-Product-Id") || "common")
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "")
     .slice(0, 64) || "common";
   const unique = crypto.randomUUID().slice(0, 8);
-  const path = `images/products/${productId}/${Date.now()}-${unique}.${extensions[contentType]}`;
+  const path = uploadScope === "portfolio"
+    ? `images/portfolio/${Date.now()}-${unique}.${extensions[contentType]}`
+    : `images/products/${productId}/${Date.now()}-${unique}.${extensions[contentType]}`;
   const repositories = githubRepositories(env);
   for (const repository of repositories.slice(1)) {
-    await writeGitHubBytes(env, path, bytes, `제품 이미지 동기화: ${productId}`, repository);
+    await writeGitHubBytes(
+      env,
+      path,
+      bytes,
+      uploadScope === "portfolio" ? "포트폴리오 이미지 동기화" : `제품 이미지 동기화: ${productId}`,
+      repository
+    );
   }
-  await writeGitHubBytes(env, path, bytes, `제품 이미지 추가: ${productId}`, repositories[0]);
+  await writeGitHubBytes(
+    env,
+    path,
+    bytes,
+    uploadScope === "portfolio" ? "포트폴리오 이미지 추가" : `제품 이미지 추가: ${productId}`,
+    repositories[0]
+  );
   return json({ ok: true, path });
 }
 
@@ -322,6 +398,16 @@ function normalizeCatalog(value) {
   return {
     _설명: "브랜드 담당자가 사이트 관리자에서 제품과 상세페이지를 관리합니다. 학생은 이 파일을 직접 수정하지 않습니다.",
     products: value.products.map(normalizeProduct),
+  };
+}
+
+function normalizePortfolio(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new HttpError(400, "포트폴리오 데이터가 올바르지 않습니다.");
+  }
+  return {
+    _설명: "브랜드 담당자가 관리자에서 포트폴리오 한 페이지를 관리합니다. 학생은 공개 페이지의 UI만 수정합니다.",
+    body: cleanText(value.body, 750000),
   };
 }
 

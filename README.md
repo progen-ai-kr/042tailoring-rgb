@@ -45,10 +45,12 @@
 | `script.js` | 공통 움직임(효과) |
 | `products.html` | 제품 목록 UI |
 | `product.html` | 브랜드가 편집기에서 만든 상세 내용을 보여주는 제품 상세 UI |
+| `portfolio.html` | 브랜드가 편집기에서 만든 한 페이지 포트폴리오 UI |
 | `style.css`의 `제품 상세페이지` 영역 | 상세페이지 디자인 |
 | `catalog.js` | 제품 데이터 로딩·안전 처리(수정 금지) |
 | `products.json` | 브랜드 담당자가 사이트 관리자에서 관리하는 제품 데이터 |
-| `/admin` | 브랜드 담당자용 비밀번호 로그인 제품 편집기 |
+| `portfolio.json` | 브랜드 담당자가 사이트 관리자에서 관리하는 포트폴리오 본문 |
+| `/admin` | 브랜드 담당자용 제품·포트폴리오 편집기 |
 
 ## 브랜드 제품 관리
 
@@ -56,4 +58,5 @@
 - 브랜드 담당자는 GitHub 계정 없이 관리자 비밀번호만으로 로그인합니다.
 - 초기 비밀번호는 `0000`입니다. 필요할 때 관리자 상단의 **비밀번호 변경** 버튼에서 바꿀 수 있습니다.
 - 제품을 저장하면 같은 브랜드의 연결된 팀 저장소에 기록되고 자동 배포 후 모든 시안에 함께 반영됩니다.
-- 학생은 `admin.html`, `admin.css`, `admin.js`, `admin-config.json`, `brand-config.js`, `worker.js`, `products.json`, `wrangler.jsonc`, `wrangler.admin.jsonc`를 수정하지 않습니다.
+- 상단 **포트폴리오** 탭에서 블로그 글처럼 한 페이지를 작성할 수 있고, 저장하면 연결된 모든 시안에 함께 반영됩니다.
+- 학생은 `admin.html`, `admin.css`, `admin.js`, `admin-config.json`, `brand-config.js`, `worker.js`, `products.json`, `portfolio.json`, `portfolio.js`, `wrangler.jsonc`, `wrangler.admin.jsonc`를 수정하지 않습니다.

@@ -116,7 +116,8 @@ button { color: inherit; }
   z-index: 30;
   top: 0;
   display: flex;
-  height: 66px;
+  min-height: 106px;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   padding: 0 18px;
@@ -124,17 +125,34 @@ button { color: inherit; }
   background: rgba(255, 255, 255, .94);
   backdrop-filter: blur(14px);
 }
+.admin-identity { display: flex; min-width: 0; align-items: center; }
 .admin-brand { font-size: 13px; font-weight: 900; letter-spacing: .12em; }
-.admin-title { margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+.admin-tabs { display: flex; gap: 3px; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--line); }
+.admin-tab {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.admin-tab:hover { background: var(--surface-soft); color: var(--ink); }
+.admin-tab.active { border-color: var(--ink); background: var(--ink); color: #fff; }
+.admin-tab.has-changes::after { display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; background: #d18a28; content: ""; vertical-align: 1px; }
+.admin-tab.active.has-changes::after { background: #ffd08a; }
 .header-actions { display: flex; align-items: center; gap: 8px; }
 .header-actions .ghost-button { padding-right: 11px; padding-left: 11px; }
 .desktop-password-label { display: none; }
 .save-state { display: none; color: var(--muted); font-size: 11px; }
 .save-state.dirty { color: #a46714; }
 
-.admin-layout { min-height: calc(100vh - 66px); }
+.admin-layout { min-height: calc(100vh - 106px); }
 .product-sidebar {
-  min-height: calc(100vh - 66px);
+  min-height: calc(100vh - 106px);
   padding: 24px 18px;
   background: var(--surface);
 }
@@ -183,7 +201,7 @@ button { color: inherit; }
 .list-empty { padding: 42px 12px; color: var(--muted); font-size: 12px; line-height: 1.7; text-align: center; }
 
 .editor-main { min-width: 0; }
-.empty-editor { display: none; min-height: calc(100vh - 66px); place-items: center; align-content: center; padding: 40px; text-align: center; }
+.empty-editor { display: none; min-height: calc(100vh - 106px); place-items: center; align-content: center; padding: 40px; text-align: center; }
 .empty-icon { display: grid; width: 54px; height: 54px; margin: 0 auto 16px; place-items: center; border: 1px solid var(--line-dark); border-radius: 50%; font-size: 24px; }
 .empty-editor h2 { margin: 0; font-size: 20px; }
 .empty-editor p { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
@@ -191,7 +209,7 @@ button { color: inherit; }
 .editor-toolbar {
   position: sticky;
   z-index: 20;
-  top: 66px;
+  top: 106px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -209,6 +227,11 @@ button { color: inherit; }
 .sidebar-toggle { flex: 0 0 auto; gap: 7px; white-space: nowrap; }
 .sidebar-toggle-icon { min-width: 10px; font-size: 16px; line-height: 1; }
 .editor-content { width: min(100% - 28px, 2200px); margin: 22px auto 80px; }
+.portfolio-admin-view { min-height: calc(100vh - 106px); }
+.portfolio-form { min-width: 0; }
+.portfolio-editor-content { width: min(100% - 28px, 2200px); }
+.portfolio-editor-panel { padding-bottom: 28px; }
+.portfolio-editor-mount .toast-editor-fallback { min-height: 820px; }
 .panel { margin-bottom: 14px; padding: 22px 18px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
 .editor-content > .panel,
 .danger-zone { width: 100%; }
@@ -364,10 +387,13 @@ body:not(.editor-open) .editor-main { display: none; }
   .password-button { padding-right: 17px !important; padding-left: 17px !important; }
   .mobile-password-label { display: none; }
   .desktop-password-label { display: inline; }
-  .admin-header { height: 72px; padding: 0 25px; }
+  .admin-header { height: 72px; min-height: 72px; flex-wrap: nowrap; padding: 0 25px; }
+  .admin-tabs { margin-left: 18px; padding-left: 18px; }
+  .admin-tab { min-height: 38px; padding: 0 15px; font-size: 12px; }
   .save-state { display: inline; }
   .desktop-only { display: inline-flex; }
   .admin-layout { display: grid; min-height: calc(100vh - 72px); grid-template-columns: 280px minmax(0, 1fr); }
+  .portfolio-admin-view { min-height: calc(100vh - 72px); }
   .product-sidebar { display: block !important; position: sticky; top: 72px; overflow-y: auto; height: calc(100vh - 72px); min-height: 0; padding: 27px 15px; border-right: 1px solid var(--line); }
   .editor-main { display: block !important; }
   .empty-editor { display: grid; min-height: calc(100vh - 72px); }
@@ -406,6 +432,20 @@ body:not(.editor-open) .editor-main { display: none; }
     visibility: hidden;
     pointer-events: none;
   }
+}
+
+@media (max-width: 719px) {
+  .admin-header { align-content: center; gap: 8px; padding-top: 9px; padding-bottom: 9px; }
+  .admin-identity { width: 100%; justify-content: space-between; }
+  .admin-brand { overflow: hidden; max-width: 36%; text-overflow: ellipsis; white-space: nowrap; }
+  .admin-tabs { margin-left: 8px; padding-left: 8px; }
+  .header-actions { width: 100%; justify-content: flex-end; }
+  .header-actions .ghost-button { min-height: 34px; padding-right: 9px; padding-left: 9px; font-size: 10px; }
+  .portfolio-toolbar { top: 106px; }
+  .portfolio-toolbar .editor-heading { flex-basis: 100%; }
+  .portfolio-toolbar .editor-actions { width: 100%; }
+  .portfolio-toolbar .editor-actions > * { flex: 1; }
+  .portfolio-editor-panel { padding-right: 10px; padding-left: 10px; }
 }
 
 @media (min-width: 1120px) {
