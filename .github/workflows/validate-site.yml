@@ -1,0 +1,37 @@
+name: Validate site
+
+on:
+  pull_request:
+    branches:
+      - main
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-site:
+    name: validate-site
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Select comparison base
+        id: base
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          QUEUE_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            echo "sha=$PR_BASE_SHA" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=$QUEUE_BASE_SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate protected files and static site
+        run: python3 .github/scripts/validate_site.py --base "${{ steps.base.outputs.sha }}" --head "${{ github.sha }}"
