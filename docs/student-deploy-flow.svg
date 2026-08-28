@@ -47,10 +47,10 @@
 
   <rect x="461" y="391" width="92" height="38" rx="19" fill="#e9edff"/>
   <text x="486" y="418" class="step">STEP 2</text>
-  <text x="461" y="474" class="card-title">Codex 다시 시작</text>
-  <text x="461" y="520" class="body">현재 Codex 섹션만 종료</text>
-  <text x="461" y="554" class="body">같은 프로젝트에서</text>
-  <text x="461" y="588" class="body">새 섹션 시작</text>
+  <text x="461" y="474" class="card-title">Codex 창 다시 열기</text>
+  <text x="461" y="520" class="body">탭의 ×로 창 닫기</text>
+  <text x="461" y="554" class="body">+ 버튼 누르기</text>
+  <text x="461" y="588" class="body">메뉴에서 Codex 선택</text>
 
   <rect x="836" y="391" width="92" height="38" rx="19" fill="#e9edff"/>
   <text x="861" y="418" class="step">STEP 3</text>
