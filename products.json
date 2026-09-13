@@ -19,9 +19,9 @@
       "images": [
         "images/products/205aa907-89ec-420b-8bb0-45d3437c0fcf/1789301170892-f954638e.jpg"
       ],
-      "buyLabel": "구매하기",
+      "buyLabel": "문의하기",
       "buyLink": "",
-      "buyNotice": "",
+      "buyNotice": "'문의' 페이지를 통해 요청을 부탁드립니다.",
       "sections": [
         {
           "type": "rich_text",
