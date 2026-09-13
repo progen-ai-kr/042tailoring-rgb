@@ -2,18 +2,46 @@
   "_설명": "브랜드 담당자가 사이트 관리자에서 제품과 상세페이지를 관리합니다. 학생은 이 파일을 직접 수정하지 않습니다.",
   "products": [
     {
+      "id": "205aa907-89ec-420b-8bb0-45d3437c0fcf",
+      "published": true,
+      "featured": true,
+      "label": "unisex / 2-size",
+      "name": "블랙 오버핏 데님 재킷 & 와이드 슬랙스 셋업",
+      "summary": "소매 라인에 대형 Safety Orange X-스티치를 배치한 대표 데님 테일러드 재킷",
+      "category": "",
+      "price": "가격 문의",
+      "keywords": [
+        "블랙",
+        "데님",
+        "자켓",
+        "슬랙스"
+      ],
+      "images": [
+        "images/products/205aa907-89ec-420b-8bb0-45d3437c0fcf/1789301170892-f954638e.jpg"
+      ],
+      "buyLabel": "구매하기",
+      "buyLink": "",
+      "buyNotice": "",
+      "sections": [
+        {
+          "type": "rich_text",
+          "body": "<p><img src=\"/images/products/205aa907-89ec-420b-8bb0-45d3437c0fcf/1789301191897-e6317982.jpg\" alt=\"의상1_1.jpg\"><br></p><p><img src=\"/images/products/205aa907-89ec-420b-8bb0-45d3437c0fcf/1789301202549-ac0b26d3.jpg\" alt=\"의상1_2.jpg\"><br></p><p><img src=\"/images/products/205aa907-89ec-420b-8bb0-45d3437c0fcf/1789301234102-883d1ba1.jpg\" alt=\"의상1_3.jpg\"><br></p><p><img src=\"/images/products/205aa907-89ec-420b-8bb0-45d3437c0fcf/1789301244615-d2f9ef6b.jpg\" alt=\"의상1_4.jpg\"><br></p><p><img src=\"/images/products/205aa907-89ec-420b-8bb0-45d3437c0fcf/1789301255458-66baa2e1.jpg\" alt=\"의상1_5.jpg\"><br></p>"
+        }
+      ]
+    },
+    {
       "id": "look-01",
       "published": true,
       "featured": true,
-      "label": "WOMEN · CARDIGAN",
-      "name": "다이널 부클 자수 니트 가디건",
-      "summary": "포근한 울 블렌딩 소재와 부클 공룡 자수로 포인트를 준 스탠다드 핏 가디건",
-      "category": "Cardigan",
-      "price": "",
+      "label": "unisex / 2-size",
+      "name": "차콜 테일러드 셋업",
+      "summary": "클래식 드레이프 재킷과 슬랙스의 포멀한 테일러드 셋업",
+      "category": "",
+      "price": "가격 문의",
       "keywords": [
-        "아이보리 · 그레이 · 네이비",
-        "울 블렌딩",
-        "부클 자수"
+        "차콜",
+        "슈트",
+        "셋업"
       ],
       "images": [
         "images/products/look-01/1787721859194-2b0dbc5f.webp"
@@ -32,15 +60,16 @@
       "id": "look-02",
       "published": true,
       "featured": true,
-      "label": "MEN · KNIT",
-      "name": "남성 트임넥 니트",
-      "summary": "부드러운 니트 텍스처와 단정한 트임넥 디자인을 갖춘 남성 데일리 니트",
-      "category": "Knit",
-      "price": "",
+      "label": "unisex / 2-size",
+      "name": "초크 베이지 벨티드 더블 셋업",
+      "summary": "허리 벨트 드레이프와 라펠/플랩 포켓 포인트 스티치가 돋보이는 럭셔리 젠더리스 룩",
+      "category": "",
+      "price": "가격 문의",
       "keywords": [
-        "아이보리 · 연그레이 · 커피 · 진그레이",
-        "트임넥",
-        "M–4XL"
+        "아이보리",
+        "베이지",
+        "더블자켓",
+        "셋업"
       ],
       "images": [
         "images/products/look-02/1787721875951-30515286.webp"
@@ -59,15 +88,14 @@
       "id": "look-03",
       "published": true,
       "featured": true,
-      "label": "WOMEN · JACKET",
-      "name": "린넨 크롭 반팔 자켓",
-      "summary": "린넨과 레이온 혼방의 내추럴한 질감이 돋보이는 가벼운 크롭 반팔 자켓",
-      "category": "Jacket",
-      "price": "",
+      "label": "unisex / 2-size",
+      "name": "워시드 슬레이트 셔츠 & 와이드 슬랙스 셋업",
+      "summary": "카라 X-스티치 디테일 린넨 워시드 셔츠와 와이드 슬랙스 셋업",
+      "category": "",
+      "price": "가격 문의",
       "keywords": [
-        "연베이지 · 블랙",
-        "린넨 혼방",
-        "크롭 기장"
+        "린넨 셔츠",
+        "와이드 슬랙스"
       ],
       "images": [
         "images/products/look-03/1787721886985-b456d1fb.webp"
