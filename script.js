@@ -221,9 +221,20 @@
       });
       if (reducedMotion) return;
       const activeVideo = videos[current];
-      activeVideo.play().catch(() => {});
+      const resume = () => activeVideo.play().catch(() => {});
+      resume();
       timer = window.setTimeout(() => show(current + 1), 7200);
     }
+
+    // 모바일에서 영상이 자연스럽게 끝나도 다음 영상으로 이어집니다.
+    videos.forEach((video, index) => {
+      video.addEventListener("ended", () => {
+        if (index === current) show(current + 1);
+      });
+      video.addEventListener("error", () => {
+        if (index === current) timer = window.setTimeout(() => show(current + 1), 1200);
+      });
+    });
 
     dots.forEach((dot) => dot.addEventListener("click", () => show(Number(dot.dataset.slideTo))));
     document.querySelector(".slide-prev")?.addEventListener("click", () => show(current - 1));
@@ -233,7 +244,11 @@
       const dx = event.changedTouches[0].clientX - startX;
       const dy = event.changedTouches[0].clientY - startY;
       if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(current + (dx < 0 ? 1 : -1));
+      else videos[current]?.play().catch(() => {});
     }, { passive: true });
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && !reducedMotion) videos[current]?.play().catch(() => {});
+    });
     document.querySelector(".lookbook")?.addEventListener("keydown", (event) => {
       if (event.key === "ArrowLeft") show(current - 1);
       if (event.key === "ArrowRight") show(current + 1);
