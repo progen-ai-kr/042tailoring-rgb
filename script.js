@@ -177,6 +177,25 @@
     document.querySelectorAll("main > section[id]").forEach((section) => observer.observe(section));
   }
 
+  // 섹션이 화면에 들어올 때 커튼처럼 부드럽게 나타나도록 처리합니다.
+  function setupSectionTransitions() {
+    if (!isHome) return;
+    const sections = [...document.querySelectorAll("main > section[id]")];
+    sections.forEach((section) => section.classList.add("section-transition"));
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      sections.forEach((section) => section.classList.add("is-visible"));
+      return;
+    }
+    const observer = new IntersectionObserver((entries, instance) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        instance.unobserve(entry.target);
+      });
+    }, { rootMargin: "-10% 0px -12%", threshold: 0.05 });
+    sections.forEach((section) => observer.observe(section));
+  }
+
   function setupSlider() {
     const videos = [...document.querySelectorAll(".lookbook-video")];
     const dots = [...document.querySelectorAll(".slide-dot")];
@@ -324,6 +343,7 @@
   document.getElementById("productSearch")?.addEventListener("input", (event) => renderSearch(event.target.value));
   setupPanels();
   setupHeader();
+  setupSectionTransitions();
   if (isHome) {
     initIntro();
     setupSlider();
