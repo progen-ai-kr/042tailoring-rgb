@@ -2,112 +2,128 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- [작성서 01] 브랜드명으로 바꾸세요 -->
-  <title>브랜드 이름</title>
-  <!-- [작성서 02] 한 줄 소개 → 검색·공유 미리보기에 나오는 설명 -->
-  <meta name="description" content="브랜드 한 줄 소개를 여기에 적으세요." />
-
-  <!-- 카톡/인스타 공유 미리보기 (OG 태그) — 브랜드명·소개·대표이미지로 바꾸세요 -->
-  <meta property="og:title" content="브랜드 이름" />
-  <meta property="og:description" content="브랜드 한 줄 소개" />
-  <meta property="og:image" content="images/og.jpg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>042 TAILORING — UNNECESSARY PERFECTION</title>
+  <meta name="description" content="대전 042와 봉제 장인정신에서 출발한 젠더리스 테일러링 브랜드." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta property="og:title" content="042 TAILORING" />
+  <meta property="og:description" content="UNNECESSARY PERFECTION" />
+  <meta property="og:image" content="images/brand/logo-full.png" />
   <meta property="og:type" content="website" />
-
-  <!-- 탭 아이콘 (images/favicon.png 넣으면 표시됨) -->
-  <link rel="icon" href="images/favicon.png" />
+  <link rel="icon" href="images/brand/logo-full.png" />
+  <link rel="preload" as="image" href="images/hero/look-9-poster.jpg" fetchpriority="high" />
+  <link rel="preload" as="video" href="images/hero/look-9.mp4" type="video/mp4" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="home-page is-intro-pending">
+  <!-- 첫 방문에만 재생되는 브랜드 인트로 -->
+  <div class="intro" id="intro">
+    <div class="intro-curtain intro-curtain-top"></div>
+    <div class="intro-curtain intro-curtain-bottom"></div>
+    <div class="intro-lockup">
+      <img class="intro-image" src="images/brand/logo-full.png" alt="042 TAILORING — UNNECESSARY PERFECTION" width="4096" height="4096" />
+    </div>
+    <button class="intro-skip" type="button">SKIP</button>
+  </div>
 
-  <!-- ===== 상단 메뉴 (5페이지 공통 — 수정하면 모든 페이지에 똑같이 반영하세요) ===== -->
-  <header class="nav">
-    <div class="nav-inner">
-      <a href="index.html" class="logo">BRAND</a>
-      <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
-      <nav class="nav-menu">
-        <a href="index.html" class="active">홈</a>
-        <a href="about.html">브랜드 소개</a>
-        <a href="products.html">제품</a>
-        <a href="portfolio.html">포트폴리오</a>
-        <a href="contact.html">문의</a>
-      </nav>
+  <header class="site-header" data-header>
+    <a class="brand-logo" href="#home" aria-label="042 TAILORING 홈">
+      <span class="brand-logo-reveal">
+        <img class="brand-logo-default" src="images/brand/logo-header-transparent.png" alt="042 TAILORING" width="1502" height="421" />
+        <img class="brand-logo-hover" src="images/brand/logo-header-hover-transparent.png" alt="" width="1501" height="420" aria-hidden="true" />
+      </span>
+    </a>
+    <div class="header-actions">
+      <button class="header-action find-trigger" type="button" aria-controls="searchPanel" aria-expanded="false"><span class="find-icon" aria-hidden="true"></span><span>FIND</span></button>
+      <button class="header-action menu-trigger" type="button" aria-controls="menuPanel" aria-expanded="false"><span>MENU</span><span class="menu-glyph" aria-hidden="true">☰</span></button>
     </div>
   </header>
 
-  <!-- ===== 히어로 [작성서 04 홈: 메인 카피·서브 카피] ===== -->
-  <section class="hero">
-    <p class="eyebrow">BRAND KEYWORD · KEYWORD</p>
-    <h1>메인 카피 (20자 내)</h1>
-    <p>서브 카피 (40자 내) — 브랜드를 소개하는 짧은 문장을 적으세요.</p>
-    <a href="products.html" class="btn">컬렉션 보기</a>
-  </section>
+  <aside class="screen-panel menu-panel" id="menuPanel" aria-hidden="true" aria-label="전체 메뉴" inert>
+    <div class="panel-top"><span>INDEX / 042</span><button class="panel-close" type="button" data-close-panel>닫기 <span aria-hidden="true">×</span></button></div>
+    <nav class="big-menu" aria-label="주요 메뉴">
+      <a href="#home" data-section-link><span>01</span>HOME</a>
+      <a href="#collection" data-section-link><span>02</span>COLLECTION</a>
+      <a href="#story" data-section-link><span>03</span>STORY</a>
+    </nav>
+    <p class="panel-note">DAEJEON / SEOUL<br />UNNECESSARY PERFECTION</p>
+  </aside>
 
-  <!-- ===== 강점 3가지 [작성서 04 홈: 강점3가지] ===== -->
-  <section class="section">
-    <p class="eyebrow">WHY US</p>
-    <h2>우리 브랜드의 강점</h2>
-    <div class="features">
-      <div class="feature">
-        <p class="num">01</p>
-        <h3>강점 제목</h3>
-        <p>강점 설명을 적으세요.</p>
-      </div>
-      <div class="feature">
-        <p class="num">02</p>
-        <h3>강점 제목</h3>
-        <p>강점 설명을 적으세요.</p>
-      </div>
-      <div class="feature">
-        <p class="num">03</p>
-        <h3>강점 제목</h3>
-        <p>강점 설명을 적으세요.</p>
-      </div>
+  <aside class="screen-panel search-panel" id="searchPanel" aria-hidden="true" aria-label="제품 검색" inert>
+    <div class="panel-top"><span>FIND / COLLECTION</span><button class="panel-close" type="button" data-close-panel>닫기 <span aria-hidden="true">×</span></button></div>
+    <div class="search-wrap">
+      <label for="productSearch">WHAT ARE YOU LOOKING FOR?</label>
+      <input id="productSearch" type="search" placeholder="TYPE TO FIND" autocomplete="off" />
+      <p class="search-hint">제품명, 소재, 색상으로 검색하세요.</p>
+      <div class="search-results" id="searchResults" aria-live="polite"></div>
     </div>
-  </section>
+  </aside>
 
-  <!-- ===== 대표 제품 미리보기 — products.json에서 자동으로 채워짐 ===== -->
-  <section class="section">
-    <p class="eyebrow">COLLECTION</p>
-    <h2>대표 룩</h2>
-    <div class="grid" id="home-looks"></div>
-  </section>
+  <main>
+    <section class="lookbook" id="home" aria-label="시즌 룩북 영상">
+      <div class="lookbook-media" id="lookbookMedia">
+        <video class="lookbook-video is-active" muted playsinline preload="auto" poster="images/hero/look-9-poster.jpg" data-slide="0"><source src="images/hero/look-9.mp4" type="video/mp4" /></video>
+        <video class="lookbook-video" muted playsinline preload="metadata" data-slide="1"><source src="images/hero/look-2.mp4" type="video/mp4" /></video>
+        <video class="lookbook-video" muted playsinline preload="metadata" data-slide="2"><source src="images/hero/look-5.mp4" type="video/mp4" /></video>
+        <video class="lookbook-video" muted playsinline preload="metadata" data-slide="3"><source src="images/hero/look-7.mp4" type="video/mp4" /></video>
+      </div>
+      <div class="lookbook-shade" aria-hidden="true"></div>
+      <div class="lookbook-copy reveal-item">
+        <p class="section-code">042 / DROP 01</p>
+        <h1>WE LEAVE<br />THE <em>THREAD.</em></h1>
+        <p class="hero-caption">Crafted in Daejeon. Limited to 100 pieces.</p>
+      </div>
+      <div class="stitch-rail" aria-hidden="true"></div>
+      <div class="slider-ui reveal-item">
+        <button class="slide-arrow slide-prev" type="button" aria-label="이전 영상">←</button>
+        <div class="slide-indicators" role="tablist" aria-label="룩북 영상 선택">
+          <button class="slide-dot is-active" type="button" role="tab" aria-selected="true" data-slide-to="0"><span>01</span><i></i></button>
+          <button class="slide-dot" type="button" role="tab" aria-selected="false" data-slide-to="1"><span>02</span><i></i></button>
+          <button class="slide-dot" type="button" role="tab" aria-selected="false" data-slide-to="2"><span>03</span><i></i></button>
+          <button class="slide-dot" type="button" role="tab" aria-selected="false" data-slide-to="3"><span>04</span><i></i></button>
+        </div>
+        <button class="slide-arrow slide-next" type="button" aria-label="다음 영상">→</button>
+      </div>
+    </section>
 
-  <!-- ===== 푸터 (5페이지 공통) [작성서 01: 푸터 표기 정보] ===== -->
-  <footer class="footer">
-    <p class="logo">BRAND</p>
-    <p class="biz">
-      상호: ○○○ · 대표자: ○○○<br />
-      사업자등록번호: 000-00-00000 · 주소: ○○○
-    </p>
-    <p>© 브랜드 이름. All rights reserved.</p>
+    <section class="collection-section" id="collection" aria-labelledby="collectionTitle">
+      <header class="section-heading">
+        <div><p class="section-code">02 / COLLECTION</p><h2 id="collectionTitle">NUMBERED<br />PIECES.</h2></div>
+        <p>REMAINING BASTING THREAD. EACH PIECE INDIVIDUALLY NUMBERED.</p>
+      </header>
+      <!-- products.json의 운영 제품이 자동 렌더링됩니다. -->
+      <div class="editorial-grid" id="home-looks" aria-live="polite"><p class="loading-copy">COLLECTION LOADING…</p></div>
+      <a class="line-link" href="products.html">VIEW ALL COLLECTION <span>↗</span></a>
+    </section>
+
+    <section class="story-section" id="story" aria-labelledby="storyTitle">
+      <div class="story-stitch" aria-hidden="true">×</div>
+      <p class="section-code">03 / MANIFESTO</p>
+      <div class="story-grid">
+        <h2 id="storyTitle">THE THREAD<br />WE CHOOSE<br />TO <em>LEAVE.</em></h2>
+        <div class="story-copy">
+          <p class="story-slogan">042 TAILORING —<br />UNNECESSARY PERFECTION</p>
+          <p>“완벽함은 지우는 일이 아니라, 무엇을 남길지 선택하는 일.”</p>
+          <p>042 TAILORING은 대전의 지역번호 042와 중동 봉제 패션 특구의 장인정신에서 시작합니다. 완성되면 제거되는 주황 시침실을 그대로 남겨, 만드는 손과 시간을 입는 사람에게 연결합니다.</p>
+          <p>모든 옷은 100벌 한정으로 제작되며 케어 라벨에는 고유 넘버와 장인의 메시지가 새겨집니다. 한 벌을 고르는 순간, 당신도 공정의 일부가 됩니다.</p>
+        </div>
+      </div>
+      <div class="value-track" role="list" aria-label="브랜드 가치">
+        <article class="value-card" role="listitem"><img src="images/story-local.jpg" alt="재봉틀과 봉제 작업 장면" loading="lazy" /><span>01</span><h3>LOCAL<br />HERITAGE</h3><p>대전 중동의 봉제 역사와 만드는 손을 기억합니다.</p></article>
+        <article class="value-card" role="listitem"><img src="images/story-raw.png" alt="옷감과 의류 제작 디테일" loading="lazy" /><span>02</span><h3>RAW<br />AESTHETIC</h3><p>숨기던 공정의 흔적을 디자인의 중심에 남깁니다.</p></article>
+        <article class="value-card" role="listitem"><img src="images/story-genderless.png" alt="젠더리스 실루엣을 보여주는 의상" loading="lazy" /><span>03</span><h3>GENDERLESS<br />FIT</h3><p>성별보다 움직임과 실루엣을 먼저 생각합니다.</p></article>
+        <article class="value-card value-card-number" role="listitem"><img src="images/story-numbered.png" alt="100벌 한정 제작을 상징하는 이미지" loading="lazy" /><span>100</span><h3>NUMBERED<br />PIECES</h3><p>한정된 수량, 고유한 기록, 오래 입는 한 벌.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-logo-wrap"><img class="footer-logo-image" src="images/brand/logo-full.png" alt="042 TAILORING — UNNECESSARY PERFECTION" width="4096" height="4096" loading="lazy" /></div>
+    <div class="footer-meta"><p>UNNECESSARY PERFECTION</p><p>DAEJEON, KOREA</p><p>© 042 TAILORING</p></div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="vendor/gsap.min.js"></script>
   <script src="catalog.js?v=20260826-rich-editor-1"></script>
-  <script>
-    // 공개 제품 중 '홈 대표 제품'을 최대 4개 보여줍니다.
-    ProductCatalog.loadVisibleProducts()
-      .then((products) => {
-        const featured = products.filter((product) => product.featured);
-        const homeProducts = (featured.length ? featured : products).slice(0, 4);
-        document.getElementById("home-looks").innerHTML = homeProducts
-          .map((p) => {
-            const image = ProductCatalog.safeImageUrl(p.images && p.images[0]);
-            const img = image
-              ? '<img src="' + ProductCatalog.escapeHtml(image) + '" alt="' + ProductCatalog.escapeHtml(p.name) + '" onerror="this.remove()" />'
-              : "";
-            return (
-              '<a class="card" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
-              '<div class="card-img">' + img + "</div>" +
-              '<p class="k">' + ProductCatalog.escapeHtml(p.label || p.category || "") + "</p>" +
-              "<h3>" + ProductCatalog.escapeHtml(p.name) + "</h3></a>"
-            );
-          })
-          .join("");
-      })
-      .catch(() => {});
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
