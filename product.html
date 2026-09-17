@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>제품 상세 — 브랜드 이름</title>
+  <title>Product — 042 TAILORING</title>
   <meta name="description" content="제품 상세 정보" />
-  <link rel="icon" href="images/favicon.png" />
+  <link rel="icon" href="images/brand/logo-full.png" />
   <link rel="stylesheet" href="style.css?v=20260826-buy-popup-2" />
   <link rel="stylesheet" href="rich-content.css?v=20260826-rich-editor-1" />
 </head>
@@ -14,7 +14,7 @@
   <header class="nav">
     <div class="nav-inner">
       <a href="index.html" class="logo">BRAND</a>
-      <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
+      <button class="nav-toggle" type="button" aria-label="메뉴 열기">☰</button>
       <nav class="nav-menu">
         <a href="index.html">홈</a>
         <a href="about.html">브랜드 소개</a>
@@ -29,25 +29,6 @@
   <main id="product-detail" aria-live="polite">
     <section class="section"><p>제품 정보를 불러오는 중…</p></section>
   </main>
-
-  <dialog id="purchaseDialog" class="purchase-dialog" aria-labelledby="purchaseDialogTitle">
-    <section class="purchase-dialog-card">
-      <header class="purchase-dialog-header">
-        <div>
-          <p class="purchase-dialog-eyebrow">PURCHASE</p>
-          <h2 id="purchaseDialogTitle">구매 안내</h2>
-        </div>
-        <form method="dialog">
-          <button class="purchase-dialog-close" type="submit" aria-label="구매 안내 닫기">×</button>
-        </form>
-      </header>
-      <p id="purchaseDialogProduct" class="purchase-dialog-product"></p>
-      <div id="purchaseDialogContent" class="purchase-dialog-content"></div>
-      <form class="purchase-dialog-actions" method="dialog">
-        <button class="btn" type="submit">확인</button>
-      </form>
-    </section>
-  </dialog>
 
   <section class="section product-back">
     <a href="products.html" class="btn ghost">← 제품 목록으로</a>
@@ -163,19 +144,6 @@
       });
     }
 
-    function setupPurchaseDialog(product) {
-      const trigger = document.querySelector("[data-purchase-dialog]");
-      const dialog = document.getElementById("purchaseDialog");
-      if (!trigger || !dialog) return;
-
-      document.getElementById("purchaseDialogProduct").textContent = product.name || "";
-      document.getElementById("purchaseDialogContent").textContent = String(product.buyNotice || "").trim();
-      trigger.addEventListener("click", () => dialog.showModal());
-      dialog.addEventListener("click", (event) => {
-        if (event.target === dialog) dialog.close();
-      });
-    }
-
     function renderSection(section, product, index) {
       if (!section || !section.type) return "";
       const esc = ProductCatalog.escapeHtml;
@@ -238,8 +206,8 @@
           ? '<a class="btn product-buy" href="' + esc(buyLink) + '" target="_blank" rel="noopener noreferrer">' +
             esc(product.buyLabel || "구매하기") + " <span aria-hidden=\"true\">↗</span></a>"
           : buyNotice
-            ? '<button class="btn product-buy" type="button" data-purchase-dialog aria-haspopup="dialog">' +
-              esc(product.buyLabel || "구매하기") + "</button>"
+            ? '<a class="btn product-buy" href="contact.html" title="' + esc(buyNotice) + '">' +
+              esc(product.buyLabel || "문의하기") + "</a>"
             : "";
 
         let sections = Array.isArray(product.sections)
@@ -268,7 +236,6 @@
           (sections ? '<div class="product-story">' + sections + "</div>" : "");
 
         setupProductCarousels();
-        setupPurchaseDialog(product);
       })
       .catch(() => {
         document.getElementById("product-detail").innerHTML =
