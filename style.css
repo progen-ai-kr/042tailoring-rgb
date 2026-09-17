@@ -18,7 +18,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); scroll-snap-type: y mandatory; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); scroll-snap-type: y proximity; -webkit-text-size-adjust: 100%; }
 body { min-width: 320px; overflow-x: hidden; background: var(--bg); color: var(--ink); font-family: var(--font-main); line-height: 1.5; }
 body.panel-open, body.is-intro-pending { overflow: hidden; }
 img, video { display: block; max-width: 100%; }
@@ -85,7 +85,7 @@ button { cursor: pointer; }
 /* 룩북 히어로 */
 .lookbook { position: relative; min-height: 100svh; overflow: hidden; background: #000; isolation: isolate; }
 .lookbook-shade, .lookbook-media { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M4 4L16 16M16 4L4 16' stroke='%23FF5500' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") 10 10, auto; }
-.lookbook, .collection-section, .story-section { scroll-snap-align: start; scroll-snap-stop: always; }
+.lookbook, .collection-section, .story-section { scroll-snap-align: start; scroll-snap-stop: normal; }
 .section-transition { opacity: 0; transform: translateY(24px); clip-path: inset(5% 0 0); transition: opacity .95s ease, transform 1.1s cubic-bezier(.2,.75,.2,1), clip-path 1.1s cubic-bezier(.2,.75,.2,1); }
 .section-transition.is-visible { opacity: 1; transform: none; clip-path: inset(0); }
 .home-page.main-ready .lookbook-media { animation: hero-media-in 1.5s .16s both cubic-bezier(.2,.7,.2,1); }
