@@ -100,15 +100,15 @@
     }
     if (reducedMotion) {
       gsap.timeline({ onComplete: complete })
-        .fromTo(image, { opacity: 0 }, { opacity: 1, duration: .28, delay: .1 })
-        .to(image, { opacity: 0, duration: .28, delay: .22 });
+        .fromTo(image, { opacity: 0 }, { opacity: 1, duration: .45, delay: .12, ease: "power1.out" })
+        .to(image, { opacity: 0, duration: .45, delay: .3, ease: "power1.in" });
       return;
     }
-    gsap.timeline({ defaults: { ease: "power2.out" }, onComplete: complete })
-      .fromTo(image, { opacity: 0, scale: .965 }, { opacity: 1, scale: 1, duration: .55, delay: .3 })
-      .to(image, { opacity: 0, scale: .985, duration: .48, delay: .8, ease: "power2.in" })
-      .to(".intro-curtain-top", { yPercent: -100, duration: .62, ease: "power3.inOut" }, 1.95)
-      .to(".intro-curtain-bottom", { yPercent: 100, duration: .62, ease: "power3.inOut" }, 1.95);
+    gsap.timeline({ defaults: { ease: "power1.out" }, onComplete: complete })
+      .fromTo(image, { opacity: 0, scale: .97 }, { opacity: 1, scale: 1, duration: .9, delay: .3, ease: "power1.out" })
+      .to(image, { opacity: 0, scale: .985, duration: .85, delay: 1.05, ease: "power1.in" })
+      .to(".intro-curtain-top", { yPercent: -100, duration: .78, ease: "power2.inOut" }, 3.05)
+      .to(".intro-curtain-bottom", { yPercent: 100, duration: .78, ease: "power2.inOut" }, 3.05);
   }
 
   function setupPanels() {
