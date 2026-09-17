@@ -105,10 +105,10 @@
       return;
     }
     gsap.timeline({ defaults: { ease: "power1.out" }, onComplete: complete })
-      .fromTo(image, { opacity: 0, scale: .97 }, { opacity: 1, scale: 1, duration: .9, delay: .3, ease: "power1.out" })
-      .to(image, { opacity: 0, scale: .985, duration: .85, delay: 1.05, ease: "power1.in" })
-      .to(".intro-curtain-top", { yPercent: -100, duration: .78, ease: "power2.inOut" }, 3.05)
-      .to(".intro-curtain-bottom", { yPercent: 100, duration: .78, ease: "power2.inOut" }, 3.05);
+      .fromTo(image, { opacity: 0, scale: .97 }, { opacity: 1, scale: 1, duration: 1.15, delay: .3, ease: "power1.out" })
+      .to(image, { opacity: 0, scale: .985, duration: 1.1, delay: 1.3, ease: "power1.in" })
+      .to(".intro-curtain-top", { yPercent: -100, duration: .82, ease: "power2.inOut" }, 3.7)
+      .to(".intro-curtain-bottom", { yPercent: 100, duration: .82, ease: "power2.inOut" }, 3.7);
   }
 
   function setupPanels() {
