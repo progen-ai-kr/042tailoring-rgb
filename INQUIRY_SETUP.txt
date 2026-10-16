@@ -1,0 +1,50 @@
+042 TAILORING 문의 폼 운영 연결
+
+구현
+- 이름, 연락처, 이메일, 문의 내용 및 동의 필수 입력
+- products.json의 공개 제품을 드롭다운으로 표시
+- 제품 상세 문의 버튼에서 product ID를 전달하여 자동 선택, 변경 가능
+- /api/inquiries에서 입력 검증 후 mt5556@naver.com으로 발송
+- 메일에 이름, 연락처, 이메일, 선택한 제품명, 문의 내용과 동의 여부를 표로 표시
+- Reply-To는 문의자가 입력한 이메일로 설정
+- 실패 시 입력 내용 유지, 재시도 시 같은 요청 키 사용
+- 발송 설정이 없으면 접수 완료를 표시하지 않고 이메일 문의 안내
+
+연결 필요
+현재 발송 서비스가 지정되지 않아 Resend HTTP API 기준으로 구현했습니다.
+실제 발송에는 아래 두 값을 042tailoring-rgb Worker의 Secret으로 등록해야 합니다.
+1. RESEND_API_KEY: 이메일 발송 권한이 있는 Resend API 키
+2. INQUIRY_FROM: Resend에서 인증한 도메인의 발신 주소
+   예: 042 TAILORING <inquiry@소유한도메인>
+수신 주소 mt5556@naver.com은 서버에서 고정합니다.
+네이버 수신 주소를 Resend 발신 주소로 사용할 수는 없습니다.
+
+Cloudflare에 인증된 환경에서 저장소 폴더 안에서 실행:
+  npx wrangler secret put RESEND_API_KEY
+  npx wrangler secret put INQUIRY_FROM
+명령의 대화형 입력에 값을 넣고, 코드나 채팅에 키를 붙여 넣지 마세요.
+
+로컬 확인:
+  npx wrangler dev --local
+  node --test tests/inquiry.test.mjs
+로컬 비밀값이 필요하면 .dev.vars에 저장합니다. 이 파일은 Git 및 정적 배포에서 제외됩니다.
+테스트는 발송 제공자를 모의 처리하며 실제 이메일을 전송하지 않습니다.
+정적 파일 서버만으로는 문의 API가 동작하지 않습니다.
+
+배포 전 확인:
+- Worker 비밀값 설정과 인증된 발신 도메인 준비
+- 기본 제품 선택, 제품 변경, 필수 입력, 모바일 화면 확인
+- 승인된 테스트 문의로 네이버 받은메일함/스팸함 도착 및 답장 주소 확인
+- API의 성공은 제공자의 발송 접수 확인이며 최종 받은메일함 도착은 별도 확인
+
+운영 변경 범위:
+worker.js의 문의 라우트, wrangler.jsonc의 API 경로/요청 제한 바인딩,
+.assetsignore의 서버 소스/테스트/비밀값 제외가 포함됩니다.
+기존 validate-site의 학생용 보호 파일 검사는 이 세 파일 변경을 차단합니다.
+운영진의 서버 기능 변경 절차로 반영해야 하며 해당 보호 규칙은 수정하지 않았습니다.
+기존 관리자, 제품 데이터, 포트폴리오, 인증 로직은 유지됩니다.
+
+공식 참고:
+https://resend.com/docs/api-reference/emails/send-email
+https://resend.com/docs/dashboard/domains/introduction
+https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/

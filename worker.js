@@ -1,3 +1,5 @@
+import { handleInquiry } from "./inquiry-api.js";
+
 // 브랜드 관리자 API입니다. 비밀번호 원문은 저장하지 않고, 비공개 Git 설정에는 해시만 보관합니다.
 const SESSION_COOKIE = "brand_admin_session";
 const SESSION_SECONDS = 60 * 60 * 24 * 30;
@@ -15,6 +17,10 @@ export default {
 
     if (env.ADMIN_STANDALONE === "true" && !url.pathname.startsWith("/api/admin/")) {
       return standaloneAdminAsset(request, env, url);
+    }
+
+    if (url.pathname === "/api/inquiries") {
+      return handleInquiry(request, env);
     }
 
     if (url.pathname.startsWith("/images/products/") || url.pathname.startsWith("/images/portfolio/")) {
