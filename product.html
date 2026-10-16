@@ -206,7 +206,7 @@
           ? '<a class="btn product-buy" href="' + esc(buyLink) + '" target="_blank" rel="noopener noreferrer">' +
             esc(product.buyLabel || "구매하기") + " <span aria-hidden=\"true\">↗</span></a>"
           : buyNotice
-            ? '<a class="btn product-buy" href="contact.html" title="' + esc(buyNotice) + '">' +
+            ? '<a class="btn product-buy" href="contact.html?product=' + encodeURIComponent(product.id) + '#inquiry-form" title="' + esc(buyNotice) + '">' +
               esc(product.buyLabel || "문의하기") + "</a>"
             : "";
 

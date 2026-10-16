@@ -6,12 +6,20 @@
     "directory": "./",
     "binding": "ASSETS",
     "run_worker_first": [
+      "/api/inquiries",
       "/api/admin/*",
       "/images/products/*",
       "/images/portfolio/*",
       "/portfolio.json"
     ]
   },
+  "ratelimits": [
+    {
+      "name": "INQUIRY_RATE_LIMITER",
+      "namespace_id": "4216102026",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ],
   "vars": {
     "GITHUB_OWNER": "progen-ai-kr",
     "GITHUB_REPO": "042tailoring-rgb",

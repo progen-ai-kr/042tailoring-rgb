@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact — 042 TAILORING</title>
-  <meta name="description" content="042 TAILORING 문의 안내." />
+  <title>문의하기 — 042 TAILORING</title>
+  <meta name="description" content="042 TAILORING 제품 및 협업 문의. 제품을 선택하고 문의 내용을 남겨 주세요." />
   <link rel="icon" href="images/brand/logo-full.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20261016-inquiry" />
 </head>
-<body>
+<body class="contact-page">
 
   <header class="nav">
     <div class="nav-inner">
@@ -24,19 +24,68 @@
     </div>
   </header>
 
-  <section class="page-head">
-    <p class="eyebrow">05 / CONTACT</p>
-    <h1>LET'S<br />CONNECT.</h1>
-    <p>042 TAILORING의 제품 및 협업 문의.</p>
-  </section>
+  <main class="contact-layout">
+    <section class="contact-intro" aria-labelledby="contact-title">
+      <p class="eyebrow">05 / CONTACT</p>
+      <h1 id="contact-title">LET'S<br />CONNECT<span>.</span></h1>
+      <p class="contact-description">마음에 드는 제품이 있나요?<br />제품부터 협업까지, 궁금한 이야기를 남겨 주세요.</p>
+      <div class="contact-details">
+        <p class="eyebrow">EMAIL</p>
+        <a href="mailto:mt5556@naver.com">mt5556@naver.com</a>
+        <p class="eyebrow">BASED IN</p>
+        <p>DAEJEON, KOREA</p>
+      </div>
+    </section>
 
-  <!-- [작성서 07: 연락 수단·운영 시간] 노출 원치 않는 항목은 블록째 지우세요 -->
-  <section class="section">
-    <div class="contact-list">
-      <div class="contact-item"><p class="label">LOCATION</p><p class="value">DAEJEON, KOREA</p></div>
-      <div class="contact-item"><p class="label">INQUIRY</p><p class="value">공식 연락처는 브랜드 운영 정보를 통해 안내됩니다.</p></div>
-    </div>
-  </section>
+    <section class="inquiry-panel" aria-labelledby="inquiry-title">
+      <div class="inquiry-heading">
+        <h2 id="inquiry-title">문의하기</h2>
+        <p><span class="required-mark" aria-hidden="true">*</span> 필수 입력</p>
+      </div>
+      <noscript><p class="inquiry-notice">온라인 문의에는 JavaScript가 필요합니다. <a href="mailto:mt5556@naver.com">이메일로 문의하기</a></p></noscript>
+      <form id="inquiry-form" class="inquiry-form" action="/api/inquiries" method="post">
+        <div class="inquiry-fields">
+          <div class="inquiry-field">
+            <label for="inquiry-name">이름 <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="inquiry-name" name="name" autocomplete="name" maxlength="80" placeholder="이름을 입력해 주세요" required />
+          </div>
+          <div class="inquiry-field">
+            <label for="inquiry-phone">연락처 <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="inquiry-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="010-1234-5678" required />
+          </div>
+          <div class="inquiry-field inquiry-wide">
+            <label for="inquiry-email">이메일 <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="inquiry-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="답변받으실 이메일을 입력해 주세요" required />
+          </div>
+          <div class="inquiry-field inquiry-wide">
+            <label for="inquiry-product">문의 제품 <span class="field-optional">선택사항</span></label>
+            <select id="inquiry-product" name="productId" aria-describedby="product-help" disabled>
+              <option value="">제품을 불러오는 중…</option>
+            </select>
+            <p id="product-help" class="field-help">상세페이지에서 선택한 제품이 자동으로 표시됩니다. 다른 제품으로 변경할 수 있습니다.</p>
+          </div>
+          <div class="inquiry-field inquiry-wide">
+            <label for="inquiry-message">문의 내용 <span class="required-mark" aria-hidden="true">*</span></label>
+            <textarea id="inquiry-message" name="message" rows="6" maxlength="3000" placeholder="사이즈, 제품 정보, 협업 등 궁금한 내용을 남겨 주세요." aria-describedby="message-count" required></textarea>
+            <p id="message-count" class="message-count"><span id="message-length">0</span> / 3,000</p>
+          </div>
+        </div>
+        <!-- 자동 입력 봇을 구분하는 항목입니다. 실제 방문자에게는 표시하지 않습니다. -->
+        <div class="inquiry-honeypot" aria-hidden="true" inert>
+          <label for="inquiry-website">웹사이트</label>
+          <input id="inquiry-website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+        <label class="inquiry-consent" for="inquiry-consent">
+          <input id="inquiry-consent" name="consent" type="checkbox" required />
+          <span>문의 답변을 위한 이름·연락처·이메일 수집 및 이용에 동의합니다. <span class="required-mark" aria-hidden="true">*</span></span>
+        </label>
+        <p class="field-help inquiry-delivery-note">작성한 내용은 042 TAILORING 담당자에게 이메일로 전달됩니다.</p>
+        <button class="btn inquiry-submit" id="inquiry-submit" type="submit" disabled>문의 보내기 <span aria-hidden="true">↗</span></button>
+        <p id="inquiry-status" class="inquiry-status" role="status" aria-live="polite" tabindex="-1">문의 양식을 준비하고 있습니다.</p>
+        <p class="inquiry-direct field-help">이메일로 직접 문의하기 <a href="mailto:mt5556@naver.com">mt5556@naver.com ↗</a></p>
+      </form>
+    </section>
+  </main>
 
   <footer class="footer">
     <p class="logo">BRAND</p>
@@ -48,5 +97,7 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="catalog.js?v=20260826-rich-editor-1"></script>
+  <script src="contact.js?v=20261016-inquiry"></script>
 </body>
 </html>
