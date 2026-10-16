@@ -301,6 +301,9 @@ button { cursor: pointer; }
 .inquiry-notice { margin-top: 20px; color: var(--ink-soft); }
 .inquiry-direct { margin-top: 20px; }
 .inquiry-direct a { display: inline-block; padding: 8px 0; text-underline-offset: 4px; }
+.inquiry-copy { min-height: 44px; margin-top: 12px; border: 0; background: transparent; color: var(--ink-soft); font-size: 12px; text-align: left; text-decoration: underline; text-underline-offset: 4px; }
+.inquiry-copy-help { margin-top: 16px; font-size: 12px; }
+.inquiry-copy-help textarea { display: block; width: 100%; margin-top: 10px; padding: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; resize: vertical; }
 @media (min-width: 720px) {
   .contact-layout { padding: 80px 4vw; }
   .inquiry-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 20px; }
