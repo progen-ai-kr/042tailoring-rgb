@@ -6,7 +6,7 @@
   <title>문의하기 — 042 TAILORING</title>
   <meta name="description" content="042 TAILORING 제품 및 협업 문의. 제품을 선택하고 문의 내용을 남겨 주세요." />
   <link rel="icon" href="images/brand/logo-full.png" />
-  <link rel="stylesheet" href="style.css?v=20261016-inquiry" />
+  <link rel="stylesheet" href="style.css?v=20261016-inquiry-2" />
 </head>
 <body class="contact-page">
 
@@ -79,9 +79,14 @@
           <input id="inquiry-consent" name="consent" type="checkbox" required />
           <span>문의 답변을 위한 이름·연락처·이메일 수집 및 이용에 동의합니다. <span class="required-mark" aria-hidden="true">*</span></span>
         </label>
-        <p class="field-help inquiry-delivery-note">작성한 내용은 042 TAILORING 담당자에게 이메일로 전달됩니다.</p>
+        <p id="inquiry-delivery-note" class="field-help inquiry-delivery-note">작성한 내용은 042 TAILORING 담당자에게 이메일로 전달됩니다.</p>
         <button class="btn inquiry-submit" id="inquiry-submit" type="submit" disabled>문의 보내기 <span aria-hidden="true">↗</span></button>
         <p id="inquiry-status" class="inquiry-status" role="status" aria-live="polite" tabindex="-1">문의 양식을 준비하고 있습니다.</p>
+        <button id="inquiry-copy" class="inquiry-copy" type="button" hidden>메일 앱이 열리지 않나요? 문의 내용 복사</button>
+        <div id="inquiry-copy-help" class="inquiry-copy-help" hidden>
+          <label for="inquiry-copy-text">아래 내용을 직접 복사해 이메일로 보내 주세요.</label>
+          <textarea id="inquiry-copy-text" rows="9" readonly></textarea>
+        </div>
         <p class="inquiry-direct field-help">이메일로 직접 문의하기 <a href="mailto:mt5556@naver.com">mt5556@naver.com ↗</a></p>
       </form>
     </section>
@@ -98,6 +103,6 @@
 
   <script src="script.js"></script>
   <script src="catalog.js?v=20260826-rich-editor-1"></script>
-  <script src="contact.js?v=20261016-inquiry"></script>
+  <script src="contact.js?v=20261016-inquiry-2"></script>
 </body>
 </html>
